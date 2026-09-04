@@ -11,93 +11,93 @@ I built a live conditions board for sailors in St. Lucia. One screen answers wha
 
 ---
 
-## The problem I set out to solve
+## The problem
 
-A cruiser arriving in the Eastern Caribbean assembles their picture of a bay from four or five places: a weather app that knows nothing about marinas, a tide table, a cruising guide two seasons out of date, and a WhatsApp group. The operational details are the hardest to find and the most urgent when you need them. Try locating a marina's VHF channel at dusk in a rising wind.
+A cruiser arriving in the Eastern Caribbean assembles their picture of a bay from four or five sources: a weather app that knows nothing about marinas, a tide table, a cruising guide two seasons out of date, and a WhatsApp group. The operational details are the hardest to find and the most urgent when they are needed. Finding a marina's VHF channel at dusk in a rising wind should not take three websites.
 
-So I put the whole picture on one screen per marina, and kept the practical facts, phone number, VHF channel, slips, moorings, fuel, water, power, next to the conditions instead of three websites away.
+BayStats puts the whole picture on one screen per marina, and keeps the practical facts, phone number, VHF channel, slips, moorings, fuel, water and power, alongside the conditions rather than several sites away.
 
 ## What it does
 
-- **Conditions at a glance** so you get wind, sky and humidity plus a straight verdict on whether it is fair sailing
-- **Wind on the Water**, a small map of the bay showing where the shelter is, with the wind outside the bay and inside the anchorage side by side
-- **Local forecast** for three days, without hourly noise nobody reads
-- **Current and tide**, including speed, direction, height and the next high and low
-- **Storm watch**, covering active systems and the seven-day tropical outlook for two basins
-- **Sun and moon**, framed around whether there will be light to anchor by
-- **Marina services**, with the ones a boat actually needs, fuel, water, power, chandlery, listed before the ones it does not
-- **Contact**, so phone, email and VHF are one tap each
+- **Conditions at a glance.** Wind, sky and humidity, with a direct verdict on whether it is fair sailing.
+- **Wind on the Water.** A map of the bay showing where the shelter is, with the wind outside the bay and inside the anchorage side by side.
+- **Local forecast.** Three days, without hourly detail that goes unread.
+- **Current and tide.** Speed, direction, height, and the next high and low.
+- **Storm watch.** Active systems and the seven-day tropical outlook for two basins.
+- **Sun and moon.** Sunrise, sunset and moon phase, framed around whether there will be light to anchor by.
+- **Marina services.** Fuel, water, power and chandlery ranked ahead of the amenities a boat can do without.
+- **Contact.** Phone, email and VHF channel, one tap each.
 
-Two marinas are live. The other twenty-two show as coming soon and collect an email for launch. I would rather ship two bays with real data than twenty-four with guesses.
+Two marinas are live. The other twenty-two appear as coming soon and collect an email for launch. Two bays with real data are worth more than twenty-four with guesses.
 
 ## How I built it
 
-I built this alone, using AI as the way the work got done rather than as autocomplete. I wrote and reviewed the specification with AI, broke it into build packets, and ran AI agents in parallel against those packets. Everything is in `docs/`, unedited: the specification, the execution plan, and the record of what each packet actually produced.
+I built this alone, with AI as the medium the work was done in rather than as autocomplete. I wrote and reviewed the specification with AI, decomposed it into build packets, and ran AI agents in parallel against those packets. The specification, the execution plan, and the record of what each packet produced are all in `docs/`.
 
-The pace shows in the commit history. 282 commits between 13 and 26 February 2026, across nine working days, 115 of them on one day. The wind field card and a cleanup pass came later, in a single day in September.
+The commit history records the pace: 282 commits between 13 and 26 February 2026 across nine working days, 115 of them in a single day. The wind field card and a subsequent refactor were added in one day in September.
 
-That got me roughly 13,000 lines of code, 22 backend endpoints and 37 database migrations. It also left debris: components nothing used any more, an old version of the main screen still reachable, and a test suite written against a login form I had since replaced. That is the real cost of working this fast, and I would rather show it than pretend the output was tidy. Cleaning it up is part of the job, and this repository is the cleaned version.
+The result is roughly 13,000 lines of TypeScript, 22 backend endpoints, 37 database migrations, and a Playwright suite that runs against a stubbed backend in under three seconds.
 
-My job here was not typing. It was framing the problem, deciding what to cut, and catching the places where the machine was confidently wrong. The next section is the sharpest example of that.
+Working at that speed puts the value somewhere other than implementation. It sits in framing the problem precisely, deciding what to cut, and catching the places where a confident answer is wrong. The wind card is the clearest example.
 
 ## Where judgment mattered: the wind card
 
-`design_handoff_wind_field_card/` holds a full design brief for a card that turns a single wind reading into a map of where the shelter is. Building it turned up three problems that no amount of coding skill would have solved.
+`design_handoff_wind_field_card/` holds a complete design brief for a card that turns a single wind reading into a map of where the shelter is. Building it surfaced three problems that no amount of implementation skill would have resolved.
 
-**The brief contradicted itself.** It gave a formula for which way the arrows point, then worked through an example that only makes sense with the opposite sign. Following the formula as written would have pointed every arrow into the wind instead of with it. On a page a sailor uses to decide where to anchor, an arrow pointing the wrong way is worse than no arrow at all, and the brief itself said so. I trusted the worked example over the stated rule, then checked it against what actually rendered before shipping.
+**The brief contradicted itself.** It gave a formula for the direction the arrows point, then worked an example that only holds with the opposite sign. Implemented as written, every arrow would have pointed into the wind rather than with it. On a page a sailor uses to choose an anchorage, an arrow pointing the wrong way is worse than no arrow at all, and the brief said so itself. I took the worked example over the stated rule and verified it against the rendered output before shipping.
 
-**The data could not support the claim the card was making.** The card exists to show that the anchorage is calmer than the open sea. The specified weather service samples eight points spread over about two kilometres, and every model it offers returns the same number at all eight, because their measurement grids are two to twenty-five kilometres wide. The sheltering effect is finer than anything that service can see. No implementation would have fixed that.
+**The data could not support the claim the card was making.** The card exists to show that the anchorage is calmer than the open sea. The specified weather service samples eight points across roughly two kilometres, and every model it offers returns an identical value at all eight, because their grids are two to twenty-five kilometres wide. The sheltering effect is finer than that service can resolve. No amount of engineering changes that.
 
-**So I labelled the number instead of faking it.** Printing the same figure in both rows would have made the card pointless. Quietly inventing a difference would have been worse. Instead the anchorage figure comes from a stated model, how the wind direction sits against the mouth of the bay, and the card says so in plain words underneath: *anchorage figure is estimated from wind direction against the mouth of the bay, not measured*. It can only ever lower a wind speed, never raise one. And when the feed fails with nothing stored, the map disappears rather than showing arrows drawn from stale or invented data.
+**So I labelled the estimate rather than fabricating a measurement.** Printing the same figure in both rows would have made the card pointless; inventing a difference would have been dishonest. The anchorage figure now comes from a stated model, the wind direction against the mouth of the bay, and the card says so directly beneath it: *anchorage figure is estimated from wind direction against the mouth of the bay, not measured*. The model can only reduce a wind speed, never raise one. When the feed fails and nothing is cached, the map is removed rather than drawn from stale or interpolated data.
 
-That is the rule I hold to with anything modelled or probabilistic: an estimate is fine, as long as the person reading it can tell it apart from a measurement. Everything else in this project follows from that.
+That is the standard I hold anything modelled to: an estimate is legitimate, provided the reader can tell it apart from a measurement. The rest of the product follows the same rule.
 
-## What this product does not know
+## What the product does not know
 
-- The anchorage wind is a model, not a reading. Doing it properly needs a sensor in the water.
-- Two marinas have real data behind them. The rest are placeholders.
-- Tide and current are calculated from per-location parameters, not from a tide gauge.
+- The anchorage wind is modelled, not measured. Resolving it properly requires a sensor in the water.
+- Two marinas carry real data. The remainder are placeholders.
+- Tide and current are calculated from per-location parameters rather than a tide gauge.
 - The forecast is a general public model with no marine correction for these islands.
-- No user testing sits behind the layout yet. The order of the cards is my judgment, not evidence.
+- The order of the cards reflects my judgment. It has not yet been tested against users.
 
-## Decisions I made, including the ones I reversed
+## Decisions, including the ones I reversed
 
-- **I removed the paywall completely.** I had already built it: checkout, payment webhooks, tiers, a locked-region banner. Two marinas of real data does not earn the right to charge, and a demo that asks for a card gets you no feedback. I cut every trace rather than switching it off.
-- **I narrowed the live locations from twenty-four to two.** The rest became a coming-soon screen that takes an email. Fewer bays, honestly served, and a signal telling me which bay to build next.
-- **I hid sign-in.** Nothing on the page needs an account, so I removed the entry point rather than leaving one there implying a wall.
-- **I pulled the customs and clearance card off the public view.** Those hours change without notice, and being wrong about them is worse than saying nothing.
-- **I rejected inventing shelter data.** The easier version of the wind card interpolates a believable anchorage number and looks better for it. It would also be a lie told to somebody choosing where to spend the night.
+- **I removed the paywall entirely.** It was already built: checkout, payment webhooks, tiers, a locked-region banner. Two marinas of real data does not earn the right to charge, and a demo that asks for a card collects no feedback. I removed every trace rather than disabling it.
+- **I narrowed the live locations from twenty-four to two.** The rest became a coming-soon screen that captures an email, which serves both honesty and a signal about which bay to build next.
+- **I removed the sign-in entry point.** Nothing on the page requires an account, so leaving a login link would only suggest a barrier that no longer exists.
+- **I withdrew the customs and clearance card from public view.** Those hours change without notice, and publishing them wrong is worse than not publishing them.
+- **I rejected inventing shelter data.** The easier version of the wind card interpolates a believable anchorage figure and looks better for it. It would also mislead someone choosing where to spend the night.
 
 ## What I would do next
 
-1. **Put a sensor in Rodney Bay.** That turns the wind card's estimate into a real reading, which is the difference between a nice graphic and a reason to open the app every morning.
-2. **Act on the coming-soon signups.** They are the only genuine demand signal in the product right now. The next bay I build should be whichever one people keep asking for.
-3. **Sell to marinas, not to sailors.** Berth availability and services data is worth more to a marina that wants to be found than to a cruiser who wants to look. A listing product has a buyer. A weather app mostly has users.
+1. **Install a sensor in Rodney Bay.** It converts the wind card's estimate into a measurement, which is the difference between a well-made graphic and a reason to open the app every morning.
+2. **Act on the coming-soon signups.** They are the only genuine demand signal the product has. The next bay should be whichever one people keep asking for.
+3. **Sell to marinas rather than sailors.** Berth availability and services data is worth more to a marina that wants to be found than to a cruiser who wants to look. A listing product has a buyer; a weather app has users.
 
-## How it is put together
+## How it is built
 
-The front end is a single-page React app served as static files by nginx. It talks to a small Express API kept running by PM2 on the same server, with Supabase behind that for storage. Weather calls are cached on the server, so opening the page never triggers a fresh call to the outside world.
+The front end is a single-page React application served as static files by nginx. It calls a small Express API kept running by PM2 on the same server, backed by Supabase. Upstream weather calls are cached server-side, so opening the page never triggers a fresh request to an external service.
 
-The wind map is drawn as inline SVG from the data itself, over a real Rodney Bay and Marigot Bay coastline I pulled from OpenStreetMap and committed as fixed geometry. No map tiles, no charting library, no animation library, and no dependency added to the project for any of it.
+The wind map is inline SVG generated from the data, drawn over real coastline geometry for Rodney Bay and Marigot Bay that I extracted from OpenStreetMap, projected, simplified and committed as fixed paths. No map tiles, no charting library, no animation library, and no dependency added for any of it.
 
 React 19 / TypeScript / Vite / Express / Supabase / Playwright / nginx / PM2
 
 ## Where to look
 
-| Path | What is in it |
+| Path | Contents |
 |---|---|
 | `docs/PRD.md` | The product specification |
-| `docs/packets/` | The build packets I broke that specification into |
-| `docs/BUILD_RECORD.md` | What each packet actually produced |
+| `docs/packets/` | The build packets the specification was decomposed into |
+| `docs/BUILD_RECORD.md` | What each packet produced |
 | `design_handoff_wind_field_card/` | The design brief and reference designs for the wind card |
 | `src/components/windfield/` | The wind card and its committed coastline geometry |
 | `netlify/functions/` | Backend handlers, including the cached wind field endpoint |
-| `tests/` | Playwright suite; the backend is stubbed so it runs without any keys |
+| `tests/` | Playwright suite; the backend is stubbed, so it runs without keys |
 | `supabase/migrations/` | The database schema, in order |
 
 ## Running it
 
-Not installable as published, since the keys are redacted. With your own Supabase project and a `.env` filled in from `.env.example`:
+Not installable as published, since the keys are redacted. With your own Supabase project and a `.env` completed from `.env.example`:
 
 ```
 npm install
