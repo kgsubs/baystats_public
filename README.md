@@ -32,7 +32,9 @@ Two marinas are live. The other twenty-two show as coming soon and collect an em
 
 ## How it was built
 
-One person, February to September 2026, with AI as the primary build medium rather than an autocomplete. The specification was generated and reviewed by AI, decomposed into build packets, and executed by AI agents working in parallel against those packets. `docs/` contains the specification, the execution plan and the build record, unedited.
+One person, with AI as the primary build medium rather than an autocomplete. The specification was generated and reviewed by AI, decomposed into build packets, and executed by AI agents working in parallel against those packets. `docs/` contains the specification, the execution plan and the build record, unedited.
+
+The git history is the honest record of the pace: 282 commits between 13 and 26 February 2026, across nine working days, 115 of them on a single day. The wind field card and a cleanup pass were added in one day in September.
 
 That approach produced roughly 13,000 lines across 22 API endpoints and 37 database migrations. It also produced a lot of debris (dead components, a superseded dashboard, a test suite written against a screen that no longer existed), which is the honest cost of moving that fast and is worth saying out loud.
 
