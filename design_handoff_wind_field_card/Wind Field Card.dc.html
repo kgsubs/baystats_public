@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  body { margin:0; background:#e9e9e9; font-family:-apple-system,"Helvetica Neue",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#17a34a; text-decoration:underline; }
+  a:hover { color:#0f7a35; }
+  @keyframes wfblow { from { transform:translate(0,0) } to { transform:translate(-70px,29px) } }
+  @keyframes wfpulse { 0%{r:5;opacity:.9} 100%{r:15;opacity:0} }
+  @keyframes wfskel { 0%{opacity:.45} 50%{opacity:.9} 100%{opacity:.45} }
+</style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="wf-arrow-light" viewBox="0 0 34 16"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 8 H26"></path><path d="M26 8 l-6 -4 M26 8 l-6 4"></path></g></symbol>
+    <symbol id="wf-arrow-mod" viewBox="0 0 34 16"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8 H26"></path><path d="M26 8 l-6 -4 M26 8 l-6 4"></path></g></symbol>
+    <symbol id="wf-arrow-fresh" viewBox="0 0 34 16"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 8 H26"></path><path d="M26 8 l-6 -4 M26 8 l-6 4"></path></g></symbol>
+    <g id="wf-field-default">
+      <g transform="translate(64,36) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="34" height="16"></use></g>
+      <g transform="translate(132,52) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="34" height="16"></use></g>
+      <g transform="translate(56,100) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="34" height="16"></use></g>
+      <g transform="translate(128,116) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="34" height="16"></use></g>
+      <g transform="translate(60,164) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="34" height="16"></use></g>
+      <g transform="translate(132,178) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="34" height="16"></use></g>
+      <g opacity=".45">
+        <g transform="translate(196,72) rotate(157.5)"><use href="#wf-arrow-light" x="-17" y="-8" width="34" height="16"></use></g>
+        <g transform="translate(190,134) rotate(157.5)"><use href="#wf-arrow-light" x="-17" y="-8" width="34" height="16"></use></g>
+      </g>
+    </g>
+    <g id="wf-field-hard">
+      <g transform="translate(64,36) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="40" height="19"></use></g>
+      <g transform="translate(138,50) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="40" height="19"></use></g>
+      <g transform="translate(60,98) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="40" height="19"></use></g>
+      <g transform="translate(136,114) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="40" height="19"></use></g>
+      <g transform="translate(64,162) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="40" height="19"></use></g>
+      <g transform="translate(138,176) rotate(157.5)"><use href="#wf-arrow-fresh" x="-17" y="-8" width="40" height="19"></use></g>
+      <g transform="translate(200,74) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="38" height="18"></use></g>
+      <g transform="translate(196,136) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="38" height="18"></use></g>
+    </g>
+  </defs>
+</svg>
+
+<section style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;padding:44px;box-sizing:border-box">
+
+  <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:1080px">
+    <div style="font:700 13px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.12em;color:#8a8a8a">TURN 2 — BUILD SPEC · WIND ON THE WATER</div>
+    <div style="font:400 15px/1.6 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#4a4a4a;max-width:780px;text-wrap:pretty">Concept <a href="#ref-1a">1a</a> resolved to production: light and dark themes matched to the live site, plus the four states the data can actually produce. Everything below is measured — see <b>design_handoff_wind_field_card/README.md</b> for tokens, the Open-Meteo contract, and acceptance criteria.</div>
+  </div>
+
+  <!-- LIGHT -->
+  <div id="2a" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">2a</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Light · default</div>
+    </div>
+    <div style="background:#eeeeee;padding:14px;border-radius:14px">
+      <div style="background:#ffffff;border-radius:12px;overflow:hidden">
+        <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#9a9a9a">WIND ON THE WATER</div>
+        <div style="margin:0 12px;border-radius:9px;overflow:hidden">
+          <svg viewBox="0 0 366 200" style="display:block;width:100%" role="img" aria-label="Wind arrows over Rodney Bay: 14 knots east-north-east offshore, 6 knots in the anchorage">
+            <rect width="366" height="200" fill="#f6f7f8"></rect>
+            <path d="M250 0 L366 0 L366 200 L226 200 C234 168 222 142 236 112 C248 86 240 52 250 0 Z" fill="#e4e4e4"></path>
+            <path d="M226 200 C234 168 222 142 236 112 C248 86 240 52 250 0" fill="none" stroke="#bdbdbd" stroke-width="1.5"></path>
+            <path d="M246 32 C274 40 288 58 276 72 C262 86 238 72 240 54 Z" fill="#d6d6d6" stroke="#bdbdbd" stroke-width="1.2"></path>
+            <text x="284" y="56" font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">PIGEON I.</text>
+            <path d="M226 200 C234 168 222 142 236 112 C248 86 240 52 250 0 L212 0 C204 54 210 88 200 114 C190 142 200 170 194 200 Z" fill="#111" opacity=".05"></path>
+            <g color="#111" opacity=".8" style="animation:wfblow 6s linear infinite">
+              <use href="#wf-field-default"></use>
+              <use href="#wf-field-default" x="70" y="-29"></use>
+            </g>
+            <circle cx="238" cy="126" r="5" fill="#17a34a"></circle>
+            <circle cx="238" cy="126" r="5" fill="none" stroke="#17a34a" stroke-width="1.5" style="animation:wfpulse 2.6s ease-out infinite"></circle>
+            <text x="16" y="190" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#6d6d6d">9 KT ENE · GUSTS 13</text>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+          <div style="background:#e7f7ec;color:#17a34a;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em">✓ LEE SIDE IS SHELTERED</div>
+          <div style="display:flex;justify-content:space-between;background:#f4f4f4;color:#111;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>OUTSIDE THE BAY</span><span>14 KT</span></div>
+          <div style="display:flex;justify-content:space-between;background:#f4f4f4;color:#111;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>IN THE ANCHORAGE</span><span>6 KT</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">Drops between <b>WINDS 9 KT ENE</b> and the phone row. Arrows point the way the wind blows (ENE → WSW); the shaded band is the lee, the two arrows inside it are drawn at 45% opacity and shorter. Arrows are plain — shaft and head only, no barbs or flags; speed is encoded by shaft length alone. Motion is a seamless one-way conveyor: the arrow field is drawn twice, one pitch apart along the wind vector, and the pair translates exactly one pitch per cycle — it never reverses, and frame 0 and frame 1 are identical, so the loop is invisible.</div>
+  </div>
+
+  <!-- DARK -->
+  <div id="2b" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">2b</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Dark · default</div>
+    </div>
+    <div style="background:#000000;padding:14px;border-radius:14px">
+      <div style="background:#0d0d0d;border-radius:12px;overflow:hidden">
+        <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#8f8f8f">WIND ON THE WATER</div>
+        <div style="margin:0 12px;border-radius:9px;overflow:hidden">
+          <svg viewBox="0 0 366 200" style="display:block;width:100%" role="img" aria-label="Wind arrows over Rodney Bay: 14 knots east-north-east offshore, 6 knots in the anchorage">
+            <rect width="366" height="200" fill="#111111"></rect>
+            <path d="M250 0 L366 0 L366 200 L226 200 C234 168 222 142 236 112 C248 86 240 52 250 0 Z" fill="#1c1c1c"></path>
+            <path d="M226 200 C234 168 222 142 236 112 C248 86 240 52 250 0" fill="none" stroke="#3d3d3d" stroke-width="1.5"></path>
+            <path d="M246 32 C274 40 288 58 276 72 C262 86 238 72 240 54 Z" fill="#242424" stroke="#3d3d3d" stroke-width="1.2"></path>
+            <text x="284" y="56" font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" letter-spacing="0.6" fill="#7a7a7a">PIGEON I.</text>
+            <path d="M226 200 C234 168 222 142 236 112 C248 86 240 52 250 0 L212 0 C204 54 210 88 200 114 C190 142 200 170 194 200 Z" fill="#ffffff" opacity=".05"></path>
+            <g color="#e6e6e6" opacity=".85" style="animation:wfblow 6s linear infinite">
+              <use href="#wf-field-default"></use>
+              <use href="#wf-field-default" x="70" y="-29"></use>
+            </g>
+            <circle cx="238" cy="126" r="5" fill="#2fbf6a"></circle>
+            <circle cx="238" cy="126" r="5" fill="none" stroke="#2fbf6a" stroke-width="1.5" style="animation:wfpulse 2.6s ease-out infinite"></circle>
+            <text x="16" y="190" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#8f8f8f">9 KT ENE · GUSTS 13</text>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+          <div style="background:#0d2a19;color:#2fbf6a;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em">✓ LEE SIDE IS SHELTERED</div>
+          <div style="display:flex;justify-content:space-between;background:#1c1c1c;color:#ffffff;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>OUTSIDE THE BAY</span><span>14 KT</span></div>
+          <div style="display:flex;justify-content:space-between;background:#1c1c1c;color:#ffffff;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>IN THE ANCHORAGE</span><span>6 KT</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">Same geometry, dark tokens only: sea <b>#111</b>, land <b>#1c1c1c</b>, coastline <b>#3d3d3d</b>, arrows <b>#e6e6e6</b> at 85%, lee band white at 5%, green shifts to <b>#2fbf6a</b> on <b>#0d2a19</b>. No hue is inverted — only value.</div>
+  </div>
+
+  <!-- STRONG -->
+  <div id="2c" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">2c</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Dark · blowing hard</div>
+    </div>
+    <div style="background:#000000;padding:14px;border-radius:14px">
+      <div style="background:#0d0d0d;border-radius:12px;overflow:hidden">
+        <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#8f8f8f">WIND ON THE WATER</div>
+        <div style="margin:0 12px;border-radius:9px;overflow:hidden">
+          <svg viewBox="0 0 366 200" style="display:block;width:100%" role="img" aria-label="Wind arrows over Rodney Bay: 27 knots east-north-east, gusting 34, exposed across the anchorage">
+            <rect width="366" height="200" fill="#111111"></rect>
+            <path d="M250 0 L366 0 L366 200 L226 200 C234 168 222 142 236 112 C248 86 240 52 250 0 Z" fill="#1c1c1c"></path>
+            <path d="M226 200 C234 168 222 142 236 112 C248 86 240 52 250 0" fill="none" stroke="#3d3d3d" stroke-width="1.5"></path>
+            <path d="M246 32 C274 40 288 58 276 72 C262 86 238 72 240 54 Z" fill="#242424" stroke="#3d3d3d" stroke-width="1.2"></path>
+            <text x="284" y="56" font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" letter-spacing="0.6" fill="#7a7a7a">PIGEON I.</text>
+            <g color="#ffffff" style="animation:wfblow 2.6s linear infinite">
+              <use href="#wf-field-hard"></use>
+              <use href="#wf-field-hard" x="70" y="-29"></use>
+            </g>
+            <circle cx="238" cy="126" r="5" fill="#ffffff"></circle>
+            <text x="16" y="190" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#c8c8c8">27 KT ENE · GUSTS 34</text>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+          <div style="background:#1c1c1c;color:#ffffff;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em">⚠ GUSTS REACH THE ANCHORAGE</div>
+          <div style="display:flex;justify-content:space-between;background:#1c1c1c;color:#ffffff;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>OUTSIDE THE BAY</span><span>32 KT</span></div>
+          <div style="display:flex;justify-content:space-between;background:#1c1c1c;color:#ffffff;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>IN THE ANCHORAGE</span><span>21 KT</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">Above 20 kt in the anchorage the green chip is withheld — it becomes a neutral row, arrows go full-white, longer, and travel more than twice as fast, and the lee band disappears because there isn't one. The palette never introduces amber or red; urgency is carried by value and motion.</div>
+  </div>
+
+  <!-- LOADING + STALE -->
+  <div id="2d" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">2d</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Loading · stale · offline</div>
+    </div>
+    <div style="background:#000000;padding:14px;border-radius:14px;display:flex;flex-direction:column;gap:14px">
+      <div style="background:#0d0d0d;border-radius:12px;overflow:hidden">
+        <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#8f8f8f">WIND ON THE WATER</div>
+        <div style="margin:0 12px;height:120px;border-radius:9px;background:#151515;animation:wfskel 1.4s ease-in-out infinite"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+          <div style="height:44px;border-radius:8px;background:#151515;animation:wfskel 1.4s ease-in-out infinite"></div>
+          <div style="height:44px;border-radius:8px;background:#151515;animation:wfskel 1.4s ease-in-out .2s infinite"></div>
+        </div>
+      </div>
+
+      <div style="background:#0d0d0d;border-radius:12px;overflow:hidden">
+        <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#8f8f8f">WIND ON THE WATER</div>
+        <div style="margin:0 12px;border-radius:9px;overflow:hidden;opacity:.34">
+          <svg viewBox="0 0 366 120" style="display:block;width:100%" aria-hidden="true">
+            <rect width="366" height="120" fill="#111111"></rect>
+            <path d="M250 0 L366 0 L366 120 L228 120 C238 88 226 56 250 0 Z" fill="#1c1c1c"></path>
+            <g color="#e6e6e6">
+              <g transform="translate(70,34) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="34" height="16"></use></g>
+              <g transform="translate(146,50) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="34" height="16"></use></g>
+              <g transform="translate(66,92) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="34" height="16"></use></g>
+              <g transform="translate(144,104) rotate(157.5)"><use href="#wf-arrow-mod" x="-17" y="-8" width="34" height="16"></use></g>
+            </g>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+          <div style="background:#1c1c1c;color:#8f8f8f;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;display:flex;justify-content:space-between"><span>LAST GOOD READING</span><span>41 MIN AGO</span></div>
+        </div>
+      </div>
+
+      <div style="background:#0d0d0d;border-radius:12px;overflow:hidden">
+        <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#8f8f8f">WIND ON THE WATER</div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:0 12px 12px">
+          <div style="background:#1c1c1c;color:#8f8f8f;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em">WIND FIELD UNAVAILABLE</div>
+        </div>
+      </div>
+    </div>
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">Skeleton keeps the card's height so the page doesn't jump. Past 30 min the map dims to 34%, the animation stops and the age is stated. On a hard failure the map is removed entirely rather than faked — one muted row, and the numbers already on the page stand alone.</div>
+  </div>
+
+  <!-- TOKENS -->
+  <div style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Tokens &amp; data contract</div>
+    <div style="background:#fff;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px;font:400 13px/1.6 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#444">
+      <div>
+        <div style="font-weight:700;color:#111;font-size:11.5px;letter-spacing:.06em;margin-bottom:6px">SURFACES · LIGHT / DARK</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;justify-content:space-between"><span>page</span><span style="font-weight:700;color:#111">#eeeeee / #000000</span></div>
+          <div style="display:flex;justify-content:space-between"><span>card</span><span style="font-weight:700;color:#111">#ffffff / #0d0d0d</span></div>
+          <div style="display:flex;justify-content:space-between"><span>row</span><span style="font-weight:700;color:#111">#f4f4f4 / #1c1c1c</span></div>
+          <div style="display:flex;justify-content:space-between"><span>row · good</span><span style="font-weight:700;color:#111">#e7f7ec / #0d2a19</span></div>
+          <div style="display:flex;justify-content:space-between"><span>accent</span><span style="font-weight:700;color:#111">#17a34a / #2fbf6a</span></div>
+          <div style="display:flex;justify-content:space-between"><span>text / muted</span><span style="font-weight:700;color:#111">#111·#9a9a9a / #fff·#8f8f8f</span></div>
+          <div style="display:flex;justify-content:space-between"><span>sea / land / coast</span><span style="font-weight:700;color:#111">f6f7f8·e4e4e4·bdbdbd</span></div>
+          <div style="display:flex;justify-content:space-between"><span>sea / land / coast</span><span style="font-weight:700;color:#111">111·1c1c1c·3d3d3d</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#111;font-size:11.5px;letter-spacing:.06em;margin-bottom:6px">GEOMETRY</div>
+        Card radius 12 · row radius 8 · map radius 9 · row padding 13/14 · stack gap 8 · card side padding 12 · label 12px/600/.09em · rows 13px/700/.04em uppercase · map viewBox 366×200 (1.83:1) · flow pitch (−70, +29) per 6s, one-way, never <code style="font-size:12px">alternate</code>
+      </div>
+      <div>
+        <div style="font-weight:700;color:#111;font-size:11.5px;letter-spacing:.06em;margin-bottom:6px">SOURCE</div>
+        One Open-Meteo call, no key, 8 grid points around 14.0833 / −60.9667 — <code style="font-size:12px">wind_speed_10m, wind_direction_10m, wind_gusts_10m</code> at <code style="font-size:12px">wind_speed_unit=kn</code>, 15-minutely, cached 10 min server-side.
+      </div>
+    </div>
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555">Full implementation brief, prop signatures, barb-encoding rules and acceptance criteria: <b>design_handoff_wind_field_card/README.md</b> (download in chat).</div>
+  </div>
+
+</section>
+
+<section id="ref-1a" style="padding:0 44px 44px;font:400 13px/1.6 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#777">Turn 1 — the five original concepts live in <b>Map Card Ideas.dc.html</b>.</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>
