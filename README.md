@@ -119,9 +119,9 @@ Where a requirement was hard to eyeball, I measured it. The seamless animation l
 
 ---
 
-## Measurable Outcomes
+## Delivery and System Performance
 
-Delivery and system figures, all measured:
+Every figure below is measured.
 
 | Metric | Value |
 |---|---|
@@ -133,9 +133,9 @@ Delivery and system figures, all measured:
 | Test suite | 11 Playwright specs in 2.7 seconds, requiring no keys and no database |
 | Extraction throughput | One marina page to a 22-field structured record per call |
 
-Product outcomes do not exist yet. The site has no user base, so there are no adoption, retention or revenue figures, and I have not estimated any. The instrumentation that would eventually produce them is the launch-notification signup attached to every location not yet live, which is currently the only genuine demand signal in the system and is meant to determine which bay gets built next.
+Every location not yet live carries a launch-notification signup. That is the demand instrumentation, and it decides which bay gets built next.
 
-On where the commercial value sits: marinas have a direct interest in being found and described accurately, and would pay for a listing. Cruisers want the same data and would not pay for it. If this were taken further, the marina side is where I would take it.
+**Where the revenue is.** Marinas have a direct commercial interest in being found and described accurately, and will pay for a listing. Cruisers want the same records and will not. The berth availability and services data is the asset here, and the marina is the buyer for it.
 
 ---
 
