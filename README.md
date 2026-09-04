@@ -117,8 +117,6 @@ Two non-deterministic surfaces, contained separately.
 - **Upstream ceiling:** 144 calls per location per day, traffic-independent
 - **Extraction:** one marina page to a 22-field structured record per call
 
-Product adoption metrics await user onboarding; the launch-notification signup on every location not yet live is the instrumentation that will produce them.
-
 **Where the revenue is.** Marinas have a direct commercial interest in being found and described accurately, and will pay for a listing. Cruisers want the same records and will not. The berth availability and services data is the asset; the marina is the buyer.
 
 ---
