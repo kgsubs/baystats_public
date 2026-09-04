@@ -85,6 +85,32 @@ Open-Meteo samples 8 points across roughly 2 km and returns an identical value a
 
 ---
 
+### Project structure
+
+```
+.
+|-- server/index.ts                    Express entry, mounts every handler
+|-- netlify/functions/                 Request handlers (historical folder name)
+|   |-- marina-scrape.ts               LLM extraction pipeline and its guardrails
+|   |-- wind-field.ts                  Batched conditions fetch, cache, shelter model
+|   |-- weather.ts, tides.ts, ...      Remaining conditions endpoints
+|   `-- auth-*.ts                      Emailed-link sign-in
+|-- src/
+|   |-- pages/                         Dashboard, account, admin screens
+|   |-- components/windfield/          The wind card
+|   |-- components/session/            Coming-soon modal, session badge
+|   |-- config/windField.ts            Per-location basemaps and sample coordinates
+|   |-- config/locations.ts            The 24-location registry
+|   |-- hooks/                         Data fetching, one hook per feed
+|   `-- lib/                           Auth, Supabase client, access rules
+|-- supabase/migrations/               Schema in order, including row-level policies
+|-- tests/                             Playwright, backend stubbed
+|-- deploy/golive.sh                   nginx vhost and certificate bootstrap
+`-- docs/                              Specification, packets, build record
+```
+
+---
+
 ## Technical Performance and Operational Telemetry
 
 Built for low latency, a small resource footprint, and reliable local execution.
@@ -125,20 +151,17 @@ Built for low latency, a small resource footprint, and reliable local execution.
 
 ---
 
-## Repository Map
+## Planning Docs
+
+Everything written before and around the code. Kept unedited.
 
 | Path | Contents |
 |---|---|
 | `docs/PRD.md` | Product specification |
-| `docs/packets/` | Build packets the specification was decomposed into |
+| `docs/packets/` | The build packets the specification was decomposed into |
 | `docs/BUILD_RECORD.md` | What each packet produced |
+| `docs/EXECUTION_PLAN.md` | How the packets were dispatched |
 | `design_handoff_wind_field_card/` | Design brief and reference designs for the wind card |
-| `netlify/functions/marina-scrape.ts` | Extraction pipeline and its guardrails |
-| `netlify/functions/wind-field.ts` | Batched conditions fetch, cache and shelter model |
-| `src/components/windfield/` | Wind card and committed coastline geometry |
-| `src/config/windField.ts` | Per-location basemaps and sample coordinates |
-| `tests/` | Playwright suite |
-| `supabase/migrations/` | Schema in order, including row-level policies |
 
 ---
 
