@@ -5,10 +5,12 @@ import { AdminVessels } from './pages/AdminVessels'
 import { AdminMarinas } from './pages/AdminMarinas'
 import { Account } from './pages/Account'
 import { MagicLink } from './pages/MagicLink'
+import { ErrorBoundary } from './components/ErrorBoundary'
 // import { HomeRedirect } from './components/ProtectedRoute'
 
 function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
       <Routes>
         <Route path="/" element={<DashboardV2 />} />
@@ -26,6 +28,7 @@ function App() {
         <Route path="/dashboard/admin" element={<Navigate to="/manage/marinalistings" replace />} />
       </Routes>
     </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 
