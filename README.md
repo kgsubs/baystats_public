@@ -1,8 +1,10 @@
-# BayStats | Marina Conditions for the Eastern Caribbean
+# BayStats
 
-> **Product case study.** Marina data exists only as prose on inconsistent third-party pages. BayStats extracts it with a language model under a fixed schema and a human approval gate, pairs it with cached conditions data, and labels every figure that is modelled rather than measured.
+BayStats is a conditions board and extraction pipeline for bay and marina data. It automates the collection of unstructured marina facility prose, parses it into a fixed schema using an LLM pipeline, pairs it with cached marine weather data, and presents verified condition reports through a lightweight web interface.
 
-**Live: [baystats.com](https://baystats.com)** | Solo build | 282 commits, 9 working days
+This repository is a hands-on case study in framing a real data friction problem, building an AI extraction pipeline to solve it, and enforcing strict security and cost guardrails at the database and application levels.
+
+**Live: [baystats.com](https://baystats.com)**
 
 | | | |
 |---|---|---|
@@ -11,139 +13,100 @@
 
 ---
 
-## Problem and Framing
+## Problem Framing
 
-**User pain.** A cruiser deciding whether to move the boat needs wind, tide, current, storm outlook, shelter and berth availability at once. Those sit across five sources, none of which talk to each other. The operational facts are the hardest to find and the most urgent: locating a marina's VHF channel at dusk in a rising wind currently takes three websites.
+Marina facility details are scattered across dozens of individual, unstandardized third-party websites. The data exists almost entirely as unstructured prose.
 
-**Why AI was required.** Marina records are unstructured prose, formatted differently on every listing site. Per-site scrapers stop scaling after a handful and break on every layout change. Schema-constrained extraction handles all of them and degrades to partial data rather than failure. That is what made 24 locations tractable for one person.
+Building and maintaining traditional CSS/DOM scrapers for dozens of independent sites is unscalable, since minor layout changes break scrapers constantly. Large Language Models, by contrast, extract structured data reliably from variable natural language.
 
-**Solution.** One screen per marina. Conditions and operational detail together, extraction gated behind human review, modelled figures labelled as modelled.
-
----
-
-## Architecture
-
-```
-Unstructured web prose
-        |
-        v
-LLM extraction (22-field JSON schema)     <- admin-triggered only
-        |
-        v
-Parse + validate                          <- unparsable response: hard error, zero writes
-        |
-        v
-Pending review queue (status = pending_review)
-        |
-        v
-Supabase, row-level security enforced     <- policy exposes 'approved' / 'manual_only' only
-        |
-        v
-Public UI
-```
-
-Conditions run on a separate, fully deterministic path:
-
-```
-8 coordinates, one batched request -> Open-Meteo -> shape validation
-    -> 10-minute server cache + last-good store -> shelter model -> SVG map
-```
-
-**Design decisions.**
-
-- **Schema-constrained, not conversational.** Fixed 22-field JSON structure. A chat surface would still have required the same human review, and would have been harder to validate.
-- **Model output never reaches a reader unreviewed.** Rows land as `pending_review`. The read gate is a database policy, so an interface bug cannot leak an unapproved record.
-- **The model touches prose only.** Weather, tide, current and astronomical figures come from numeric feeds and never pass through it.
-- **Zero runtime dependencies for the map.** Inline SVG over coastline geometry pulled from OpenStreetMap, projected, simplified with Douglas-Peucker, committed as fixed paths: 2,117 source points reduced to 123 for Rodney Bay, 58 for Marigot Bay. No map tiles, no charting library, no animation library.
+BayStats uses an LLM-driven ingestion pipeline to normalize inconsistent prose into a single, predictable format without writing or maintaining per-site scraping scripts.
 
 ---
 
-## Safety and Guardrails
+## System Architecture
 
-Two non-deterministic surfaces, contained separately.
+Two pipelines, separated by how far their output can be trusted. Facility data passes through a model and a human. Weather data does neither.
 
-### Language model extraction
+**Pipeline 1: facility extraction, admin-triggered, human-gated**
 
-| Risk | Control |
-|---|---|
-| **Schema constraint** | Fixed 22-field JSON schema in the prompt; an unparsable response fails hard with zero writes and no partial record |
-| **Unreviewed data reaching users** | Every extracted row is written `pending_review` and requires explicit human approval |
-| **Application or UI bug leaking data** | Row-level security policy on `status` gates all reads, enforced by the database independently of application code |
-| **Endpoint abuse** | Extraction requires an authenticated admin and is unreachable from the public interface |
-| **API cost** | Extraction is admin-triggered per marina page, never on a user request path |
+```
+[ Unstructured prose, third-party marina page ]
+                 |
+                 v
+[ LLM extraction and validation ]  ---> unparsable schema fails hard, zero writes
+                 |
+                 v
+[ Pending review queue ]           ---> admin-authenticated verification
+                 |
+                 v
+[ Supabase with RLS ]              ---> database policy isolates unverified records
+                 |
+                 v
+[ Public UI ]
+```
 
-### Modelled wind figures
+**Pipeline 2: conditions, fully deterministic**
 
-**Constraint.** Open-Meteo samples 8 points across ~2 km and returns an identical value at all 8, because its grids are 2 to 25 km wide. The sheltering effect the card exists to show is finer than the feed resolves.
+```
+[ 8 coordinates, one batched request ]
+                 |
+                 v
+[ Open-Meteo ] -> [ shape validation ] -> [ 10-minute origin cache + last-good store ]
+                 |
+                 v
+[ Shelter model ] -> [ SVG map, estimate labelled ]
+```
 
-**Response.** Model it, bound it, label it.
+Weather, tide, current and astronomical figures never pass through a model.
 
-- **Bounded.** Wind direction against the bay's mouth bearing, factor clamped to 0.40-1.00, so it can only reduce a wind speed.
+### Ingestion and Extraction Pipeline
+
+- **LLM parsing.** Extracted prose is constrained to a fixed 22-field JSON schema stated in the prompt, using Anthropic models. If a response cannot be parsed against that schema, the extraction fails hard and nothing is written to the database.
+- **Isolated cost surface.** LLM extraction is admin-authenticated (`netlify/functions/marina-scrape.ts`) and triggered manually per page. It is strictly off the public user request path, so public traffic cannot drive up API token costs.
+
+### Security and Data Validation
+
+- **Human-in-the-loop review.** Every record the extraction pipeline produces lands in a pending review queue before public display.
+- **Database-level isolation.** Access control is enforced by Supabase Row Level Security policies. Unreviewed records cannot be read by public queries, so a frontend or application bug cannot leak unverified data.
+
+### Serving Layer and Rate Discipline
+
+- **Origin-side caching.** Upstream weather data from Open-Meteo is cached server-side in a PostgreSQL `wind_field_cache` table with a 10-minute TTL (`CACHE_MS = 10 * 60 * 1000`).
+- **Hard request ceiling.** That cache limits upstream calls to 144 requests per location per day, regardless of public traffic volume.
+- **Origin delivery.** Static assets are served directly from origin by nginx. There is no CDN or edge layer.
+
+### Modelled Figures
+
+Open-Meteo samples 8 points across roughly 2 km and returns an identical value at all 8, because its grids are 2 to 25 km wide. The sheltering effect the wind card exists to show is finer than the feed resolves.
+
+- **Bounded.** The anchorage figure derives from wind direction against the bay's mouth bearing, clamped to a factor of 0.40 to 1.00, so it can only reduce a wind speed.
 - **Labelled.** Stated in the interface beneath the number: *anchorage figure is estimated from wind direction against the mouth of the bay, not measured*.
-- **Flagged.** Applied only when the feed genuinely returns identical inshore and offshore values; the payload carries an explicit `anchorageEstimated` flag.
-- **Aged out.** A reading over 30 minutes old dims the map, stops all motion, and states its age in words.
-- **Removed on failure.** Feed down with no cache: the map is removed, not drawn. Nothing is interpolated or extrapolated.
-- **Never borrowed.** A location without its own committed basemap and sample coordinates gets no card, so one bay is never shown another's data.
-
-**Cost ceiling.** The 10-minute server cache caps each location at **144 upstream calls per day**, independent of traffic volume.
-
-**Failure handling.** Every upstream response is shape-checked; a non-numeric wind value throws rather than propagating. The last-good payload persists, so a failed refresh degrades to stale instead of empty. A React error boundary wraps the application, with a test reproducing the original crash it was built to catch.
+- **Removed on failure.** Feed down with no cache: the map is removed, not drawn. No value is interpolated or extrapolated.
 
 ---
 
-## Execution and Iteration
+## Technical Performance and Operational Telemetry
 
-**Framing first.** Specification, review and decomposition into build packets are in `docs/`, unedited.
+Built for low latency, a small resource footprint, and reliable local execution.
 
-**AI as the build medium.** Specification written and reviewed with AI, decomposed into packets, executed by AI agents running in parallel. 282 commits between 13 and 26 February 2026 across 9 working days, 115 in a single day.
-
-**Three failure modes found only against real data:**
-
-1. **The design brief contradicted itself.** It stated `direction - 90`, then worked its example as ENE giving 157.5 degrees, which requires `+ 90`. Built as written, every arrow points into the wind, telling sailors to anchor on the exposed side. I took the worked example and verified against rendered output.
-2. **The data source could not support the product claim.** Found by querying every model the service offers and comparing all 8 sample points. No implementation fixes this, so the answer had to be a product decision.
-3. **Two crashes surfaced while writing tests.** An error payload with no grid took down the whole page; the loading state stood 5px shorter than the loaded state. Both fixed, both covered.
-
-**Verification, not inspection.** The seamless animation loop was proved by pausing at exact cycle boundaries and hashing frames: identical at t=0 and t=6s, different mid-cycle, motion consistently downwind.
+| Metric | Measured Value | Implementation Context |
+| :--- | :--- | :--- |
+| **Warm response latency** | `0.15s - 0.35s` | Origin response times measured against the live site |
+| **Frontend bundle size** | `348 KB` (`100 KB` gzipped) | Compact client distribution footprint (`dist/`) |
+| **Test suite velocity** | `2.7s` | Complete 11-test suite, no keys or database required |
+| **Upstream request limit** | `144 calls/loc/day` | Enforced by the 10-minute server-side Postgres cache |
+| **Build velocity** | `282 commits / 9 days` | Single contributor, AI-orchestrated build packets |
 
 ---
 
-## Delivery and Performance
+## Tech Stack and Project Structure
 
-- **Build velocity:** 282 commits, 9 working days, one person
-- **Codebase:** ~10,900 lines TypeScript, 22 backend endpoints, 37 migrations
-- **Warm response:** 0.15s to 0.35s, cached conditions endpoint
-- **Client bundle:** 348 KB, 100 KB gzipped, no map or charting library
-- **Test suite:** 11 Playwright specs in 2.7s, no keys and no database required
-- **Upstream ceiling:** 144 calls per location per day, traffic-independent
-- **Extraction:** one marina page to a 22-field structured record per call
-
-**Where the revenue is.** Marinas have a direct commercial interest in being found and described accurately, and will pay for a listing. Cruisers want the same records and will not. The berth availability and services data is the asset; the marina is the buyer.
-
----
-
-## Stack and Quickstart
-
-**Application:** React 19, TypeScript, Vite, React Router
-**Backend:** Express 5 on Node, Supabase (PostgreSQL, row-level security)
-**AI:** Claude Sonnet, schema-constrained extraction, admin-gated
-**Data:** Open-Meteo (weather, marine), OpenStreetMap (coastline, ODbL)
-**Testing:** Playwright against a stubbed backend
-**Deployment:** nginx static, PM2 supervising the API, Let's Encrypt
-
-Credentials are redacted, so the published repository is not installable as-is. With your own Supabase project:
-
-```bash
-git clone git@github.com:kgsubs/baystats_public.git
-cd baystats_public
-npm install
-cp .env.example .env        # Supabase URL and keys
-npm run dev                 # Vite on 5173, API on 3457
-npm test                    # Playwright, no keys required
-```
-
----
-
-## Repository Map
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS (admin screens; the public dashboard uses inline style tokens)
+- **Backend and API**: Express 5 on Node, TypeScript. Handlers live in `netlify/functions/` for historical reasons and are mounted by an Express adapter in `server/index.ts`; there is no Netlify deployment.
+- **Database and Auth**: Supabase (PostgreSQL with Row Level Security policies)
+- **AI and Data Pipelines**: Anthropic API (`netlify/functions/marina-scrape.ts`), Open-Meteo (`netlify/functions/wind-field.ts`)
+- **Testing**: Playwright against a stubbed backend
+- **Infrastructure**: nginx origin deployment (`deploy/golive.sh`), PM2 supervising the API, Let's Encrypt
 
 | Path | Contents |
 |---|---|
@@ -151,12 +114,54 @@ npm test                    # Playwright, no keys required
 | `docs/packets/` | Build packets the specification was decomposed into |
 | `docs/BUILD_RECORD.md` | What each packet produced |
 | `design_handoff_wind_field_card/` | Design brief and reference designs for the wind card |
-| `netlify/functions/marina-scrape.ts` | Extraction pipeline and its guardrails |
-| `netlify/functions/wind-field.ts` | Batched conditions fetch, cache, shelter model |
 | `src/components/windfield/` | Wind card and committed coastline geometry |
 | `src/config/windField.ts` | Per-location basemaps and sample coordinates |
 | `tests/` | Playwright suite |
 | `supabase/migrations/` | Schema in order, including row-level policies |
+
+---
+
+## Quickstart
+
+### Prerequisites
+
+- Node.js 20.19+ or 22.12+ (required by Vite 7)
+- npm
+
+Credentials are redacted from this repository, so it is not installable as-is. The steps below assume your own Supabase project.
+
+### Local Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/kgsubs/baystats_public.git
+   cd baystats_public
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables.** Copy `.env.example` to `.env` and supply your Supabase credentials, plus an Anthropic key if you intend to run the extraction pipeline:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Run the local development server** (Vite on 5173, API on 3457):
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Run the test suite** (no keys or database required):
+
+   ```bash
+   npm test
+   ```
 
 ---
 
