@@ -99,14 +99,33 @@ Built for low latency, a small resource footprint, and reliable local execution.
 
 ---
 
-## Tech Stack and Project Structure
+## Stack
 
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS (admin screens; the public dashboard uses inline style tokens)
-- **Backend and API**: Express 5 on Node, TypeScript. Handlers live in `netlify/functions/` for historical reasons and are mounted by an Express adapter in `server/index.ts`; there is no Netlify deployment.
-- **Database and Auth**: Supabase (PostgreSQL with Row Level Security policies)
-- **AI and Data Pipelines**: Anthropic API (`netlify/functions/marina-scrape.ts`), Open-Meteo (`netlify/functions/wind-field.ts`)
-- **Testing**: Playwright against a stubbed backend
-- **Infrastructure**: nginx origin deployment (`deploy/golive.sh`), PM2 supervising the API, Let's Encrypt
+| Layer | Choice | Notes |
+|---|---|---|
+| **Frontend** | React 19, TypeScript, Vite 7 | The public dashboard styles from an inline theme token object; Tailwind covers the admin screens only |
+| **Routing** | React Router 7 | Single-page app, served as static files |
+| **Backend** | Express 5 on Node, TypeScript | Handlers sit in `netlify/functions/` for historical reasons and are mounted by an adapter in `server/index.ts`. There is no Netlify deployment |
+| **Database** | Supabase, PostgreSQL | Row Level Security policies gate every public read |
+| **Auth** | Custom JWT in an httpOnly cookie | Sign-in by emailed link, so no password is ever stored |
+| **AI** | Claude Sonnet | Schema-constrained extraction, admin-triggered, off the user request path |
+| **Weather data** | Open-Meteo | One batched 8-coordinate request, cached server-side for 10 minutes |
+| **Map geometry** | OpenStreetMap coastline, ODbL | Projected, simplified and committed as static SVG paths |
+| **Testing** | Playwright | The backend is stubbed, so the suite needs no keys and no database |
+| **Web server** | nginx | Serves built files from origin; no CDN or edge layer |
+| **Process supervision** | PM2 | Keeps the API alive on the same host |
+| **TLS** | Let's Encrypt | Issued and renewed by certbot |
+
+### Deliberate omissions
+
+- **No map or charting library.** The wind field is inline SVG generated from the data over committed coastline geometry.
+- **No animation library.** Motion is CSS keyframes, generated per render so the flow vector always matches the current wind direction.
+- **No CDN.** A single origin, with caching done server-side where the request ceiling can actually be enforced.
+- **No state management library.** Component state and a handful of hooks cover the whole dashboard.
+
+---
+
+## Repository Map
 
 | Path | Contents |
 |---|---|
@@ -114,54 +133,12 @@ Built for low latency, a small resource footprint, and reliable local execution.
 | `docs/packets/` | Build packets the specification was decomposed into |
 | `docs/BUILD_RECORD.md` | What each packet produced |
 | `design_handoff_wind_field_card/` | Design brief and reference designs for the wind card |
+| `netlify/functions/marina-scrape.ts` | Extraction pipeline and its guardrails |
+| `netlify/functions/wind-field.ts` | Batched conditions fetch, cache and shelter model |
 | `src/components/windfield/` | Wind card and committed coastline geometry |
 | `src/config/windField.ts` | Per-location basemaps and sample coordinates |
 | `tests/` | Playwright suite |
 | `supabase/migrations/` | Schema in order, including row-level policies |
-
----
-
-## Quickstart
-
-### Prerequisites
-
-- Node.js 20.19+ or 22.12+ (required by Vite 7)
-- npm
-
-Credentials are redacted from this repository, so it is not installable as-is. The steps below assume your own Supabase project.
-
-### Local Setup
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/kgsubs/baystats_public.git
-   cd baystats_public
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables.** Copy `.env.example` to `.env` and supply your Supabase credentials, plus an Anthropic key if you intend to run the extraction pipeline:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Run the local development server** (Vite on 5173, API on 3457):
-
-   ```bash
-   npm run dev
-   ```
-
-5. **Run the test suite** (no keys or database required):
-
-   ```bash
-   npm test
-   ```
 
 ---
 
