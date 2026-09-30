@@ -6,10 +6,6 @@
 
 **Live Build:** [baystats.com](https://baystats.com)
 
-This repository is the real source behind the live product, published as a case study and licensed
-under MIT (see [License](#license)). It is fully installable with your own accounts and API keys for
-Supabase, Gemini and Resend.
-
 **CONTENTS**
 
 - [WHAT IS THIS?](#what-is-this)
@@ -38,6 +34,10 @@ it appears on the dashboard. Weather, wind and sea state come from Open-Meteo, s
 the National Hurricane Center, and sun and moon times from sunrise-sunset.org; server code fetches,
 caches and computes them directly. Estimated figures are labeled as estimates, and a figure whose
 feed is down is hidden until fresh data arrives.
+
+This repository is the real source behind the live product, published as a case study and licensed
+under MIT (see [License](#license)). It is fully installable with your own accounts and API keys for
+Supabase, Gemini and Resend.
 
 | | | |
 |---|---|---|
