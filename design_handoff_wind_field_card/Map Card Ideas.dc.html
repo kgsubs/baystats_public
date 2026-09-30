@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  body { margin:0; background:#eeeeee; font-family:-apple-system,"Helvetica Neue",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#17a34a; text-decoration:underline; }
+  a:hover { color:#0f7a35; }
+  @keyframes drift { 0%{transform:translateX(0)} 100%{transform:translateX(26px)} }
+  @keyframes squall { 0%{transform:translate(-90px,18px)} 100%{transform:translate(420px,-14px)} }
+  @keyframes sweep { 0%{opacity:.15} 50%{opacity:.5} 100%{opacity:.15} }
+  @keyframes pulse { 0%{r:3;opacity:1} 100%{r:13;opacity:0} }
+  @keyframes flow { 0%{stroke-dashoffset:64} 100%{stroke-dashoffset:0} }
+  @keyframes bob { 0%{transform:translateY(0)} 50%{transform:translateY(-2px)} 100%{transform:translateY(0)} }
+</style>
+</helmet>
+
+<section style="display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start;padding:44px;box-sizing:border-box">
+
+  <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:1100px">
+    <div style="font:700 13px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.12em;color:#8a8a8a">TURN 1 — MAP CARD CONCEPTS</div>
+    <div style="font:400 15px/1.6 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;max-width:760px;text-wrap:pretty">Five map cards drawn in the existing mobile language — white card, gray label rows, green for “conditions are fine”, black for the one action. Each sits next to a block the page already shows, so the map explains a number rather than adding a new topic. Notes under each mock name the live source.</div>
+  </div>
+
+  <!-- 1a WIND FIELD -->
+  <div id="1a" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">1a</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Wind field over the bay</div>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.07)">
+      <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#9a9a9a">WIND ON THE WATER</div>
+      <div style="margin:0 12px;border-radius:9px;overflow:hidden;background:#f7f8f9">
+        <svg viewBox="0 0 390 210" style="display:block;width:100%">
+          <rect width="390" height="210" fill="#f6f7f8"></rect>
+          <path d="M262 0 L390 0 L390 210 L236 210 C244 176 232 150 246 118 C258 90 250 54 262 0 Z" fill="#e4e4e4"></path>
+          <path d="M236 210 C244 176 232 150 246 118 C258 90 250 54 262 0" fill="none" stroke="#bdbdbd" stroke-width="1.5"></path>
+          <path d="M258 34 C286 42 300 60 288 74 C274 88 250 74 252 56 Z" fill="#d6d6d6" stroke="#bdbdbd" stroke-width="1.2"></path>
+          <text x="292" y="58" font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">PIGEON I.</text>
+          <text x="300" y="150" font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">RODNEY BAY</text>
+          <g style="animation:drift 4.5s linear infinite alternate">
+            <g stroke="#111" stroke-width="1.6" fill="none" opacity=".72">
+              <path d="M30 34 l22 -9 M52 25 l-7 -1 M52 25 l-2 6"></path>
+              <path d="M96 52 l22 -9 M118 43 l-7 -1 M118 43 l-2 6"></path>
+              <path d="M162 30 l22 -9 M184 21 l-7 -1 M184 21 l-2 6"></path>
+              <path d="M40 100 l22 -9 M62 91 l-7 -1 M62 91 l-2 6"></path>
+              <path d="M110 118 l22 -9 M132 109 l-7 -1 M132 109 l-2 6"></path>
+              <path d="M176 96 l22 -9 M198 87 l-7 -1 M198 87 l-2 6"></path>
+              <path d="M28 166 l22 -9 M50 157 l-7 -1 M50 157 l-2 6"></path>
+              <path d="M100 182 l22 -9 M122 173 l-7 -1 M122 173 l-2 6"></path>
+              <path d="M170 160 l22 -9 M192 151 l-7 -1 M192 151 l-2 6"></path>
+            </g>
+          </g>
+          <circle cx="252" cy="132" r="5" fill="#17a34a"></circle>
+          <circle cx="252" cy="132" r="5" fill="none" stroke="#17a34a" stroke-width="1.5" style="animation:pulse 2.4s ease-out infinite"></circle>
+          <text x="20" y="200" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#9a9a9a">9 KT ENE · GUSTS 13</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+        <div style="display:flex;justify-content:space-between;background:#e7f7ec;color:#17a34a;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>✓ LEE SIDE IS SHELTERED</span></div>
+        <div style="display:flex;justify-content:space-between;background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111"><span>OUTSIDE THE BAY</span><span>14 KT</span></div>
+        <div style="display:flex;justify-content:space-between;background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111"><span>IN THE ANCHORAGE</span><span>6 KT</span></div>
+      </div>
+    </div>
+
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">
+      <div style="font-weight:700;letter-spacing:.05em;color:#111;font-size:11.5px;margin-bottom:5px">SITS WITH · WINDS 9 KT ENE</div>
+      Turns the single wind reading into a picture of where the shelter is — barbs animate along the wind vector, one pin marks the marina. <b>Live:</b> Open-Meteo forecast API, no key, sampled on a 4×3 grid of lat/lon points around the bay; arrow angle = wind direction, barb count = speed band.
+    </div>
+  </div>
+
+  <!-- 1b SQUALL RADAR -->
+  <div id="1b" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">1b</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Squall radar loop</div>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.07)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:15px 16px 10px">
+        <div style="font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#9a9a9a">RAIN NEXT 90 MIN</div>
+        <div style="font:700 11px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.07em;color:#9a9a9a">−60 → +90</div>
+      </div>
+      <div style="margin:0 12px;border-radius:9px;overflow:hidden;background:#f2f3f4;position:relative">
+        <svg viewBox="0 0 390 210" style="display:block;width:100%">
+          <rect width="390" height="210" fill="#f4f5f6"></rect>
+          <g style="animation:squall 9s linear infinite">
+            <ellipse cx="60" cy="70" rx="52" ry="30" fill="#c9cdd0" opacity=".85"></ellipse>
+            <ellipse cx="52" cy="66" rx="26" ry="15" fill="#8d9498"></ellipse>
+            <ellipse cx="150" cy="128" rx="40" ry="24" fill="#d3d7d9" opacity=".8"></ellipse>
+            <ellipse cx="146" cy="126" rx="17" ry="10" fill="#9aa1a5"></ellipse>
+          </g>
+          <path d="M244 0 L390 0 L390 210 L218 210 C226 176 214 150 228 118 C240 90 232 54 244 0 Z" fill="none" stroke="#a9a9a9" stroke-width="1.5"></path>
+          <path d="M244 0 L390 0 L390 210 L218 210 C226 176 214 150 228 118 C240 90 232 54 244 0 Z" fill="#e0e0e0" opacity=".65"></path>
+          <circle cx="234" cy="132" r="4.5" fill="#111"></circle>
+          <circle cx="234" cy="132" r="46" fill="none" stroke="#111" stroke-width="1" stroke-dasharray="3 5" opacity=".4"></circle>
+          <circle cx="234" cy="132" r="92" fill="none" stroke="#111" stroke-width="1" stroke-dasharray="3 5" opacity=".28"></circle>
+          <text x="20" y="200" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#8d8d8d">5 NM / 10 NM RINGS</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>SQUALL ARRIVES</span><span>≈ 19:40</span></div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>DURATION</span><span>25 MIN</span></div>
+        <div style="background:#000;color:#fff;border-radius:8px;padding:15px 14px;text-align:center;font:700 13px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em">PLAY LAST HOUR →</div>
+      </div>
+    </div>
+
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">
+      <div style="font-weight:700;letter-spacing:.05em;color:#111;font-size:11.5px;margin-bottom:5px">SITS WITH · LOCAL FORECAST</div>
+      “Light drizzle” is a day-scale word; a loop answers <i>right now, do I launch the dinghy</i>. Frames sweep past the island with distance rings from the marina. <b>Live:</b> RainViewer public radar/nowcast tiles (free, keyless) — past 60 min plus nowcast frames; grayscale ramp keeps it on-palette.
+    </div>
+  </div>
+
+  <!-- 1c STORM BASIN -->
+  <div id="1c" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">1c</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Basin watch map</div>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.07)">
+      <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#9a9a9a">STORM WATCH</div>
+      <div style="display:flex;justify-content:space-between;background:#e7f7ec;color:#17a34a;border-radius:8px;padding:13px 14px;margin:0 12px 10px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em"><span>✓ NO ACTIVE SYSTEMS</span></div>
+      <div style="margin:0 12px;border-radius:9px;overflow:hidden;background:#f6f7f8">
+        <svg viewBox="0 0 390 210" style="display:block;width:100%">
+          <rect width="390" height="210" fill="#f6f7f8"></rect>
+          <g stroke="#e2e2e2" stroke-width="1">
+            <path d="M0 52 H390 M0 104 H390 M0 156 H390 M78 0 V210 M156 0 V210 M234 0 V210 M312 0 V210"></path>
+          </g>
+          <g fill="#dcdcdc" stroke="#bcbcbc" stroke-width="1">
+            <path d="M0 138 C26 130 54 140 70 156 C46 168 14 166 0 158 Z"></path>
+            <ellipse cx="112" cy="120" rx="26" ry="9"></ellipse>
+            <ellipse cx="168" cy="112" rx="18" ry="7"></ellipse>
+            <ellipse cx="212" cy="106" rx="9" ry="6"></ellipse>
+            <ellipse cx="246" cy="120" rx="6" ry="9"></ellipse>
+            <ellipse cx="256" cy="140" rx="5" ry="7"></ellipse>
+            <ellipse cx="262" cy="158" rx="5" ry="8"></ellipse>
+            <ellipse cx="268" cy="178" rx="6" ry="9"></ellipse>
+            <path d="M300 190 C330 182 366 186 390 196 L390 210 L296 210 Z"></path>
+          </g>
+          <g style="animation:sweep 5s ease-in-out infinite">
+            <ellipse cx="300" cy="86" rx="72" ry="40" fill="none" stroke="#9a9a9a" stroke-width="1.4" stroke-dasharray="5 6"></ellipse>
+            <text x="266" y="90" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">MDR — QUIET</text>
+          </g>
+          <circle cx="262" cy="140" r="5.5" fill="#17a34a"></circle>
+          <text x="200" y="140" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.7" fill="#17a34a">ST. LUCIA</text>
+          <text x="20" y="30" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#9a9a9a">N ATLANTIC + CARIBBEAN · 7 DAY</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>TRACKED SYSTEMS</span><span>0</span></div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>NEAREST INVEST</span><span>NONE</span></div>
+        <div style="background:#000;color:#fff;border-radius:8px;padding:15px 14px;text-align:center;font:700 13px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em">VIEW NHC OUTLOOK →</div>
+      </div>
+    </div>
+
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">
+      <div style="font-weight:700;letter-spacing:.05em;color:#111;font-size:11.5px;margin-bottom:5px">SITS WITH · STORM WATCH</div>
+      The card currently says nothing is coming twice, in words. A map proves it — and in season the same component fills with real cones and tracks, so the empty state is the reassuring state. <b>Live:</b> NHC <code>CurrentStorms.json</code> plus the public track/cone GeoJSON and the tropical-weather-outlook shapefiles.
+    </div>
+  </div>
+
+  <!-- 1d APPROACH CHART -->
+  <div id="1d" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">1d</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Approach &amp; berth chart</div>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.07)">
+      <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#9a9a9a">APPROACH</div>
+      <div style="margin:0 12px;border-radius:9px;overflow:hidden;background:#f6f7f8">
+        <svg viewBox="0 0 390 230" style="display:block;width:100%">
+          <rect width="390" height="230" fill="#f7f8f9"></rect>
+          <path d="M0 0 H150 C150 44 176 60 176 92 C176 122 150 138 150 186 C150 214 132 224 118 230 H0 Z" fill="#e6e6e6" stroke="#c2c2c2" stroke-width="1.4"></path>
+          <path d="M390 0 H226 C226 46 200 62 200 92 C200 124 228 140 232 186 C234 214 250 226 264 230 H390 Z" fill="#e6e6e6" stroke="#c2c2c2" stroke-width="1.4"></path>
+          <rect x="236" y="26" width="130" height="86" rx="6" fill="#ededed" stroke="#c2c2c2" stroke-width="1.2"></rect>
+          <g stroke="#b6b6b6" stroke-width="4" stroke-linecap="round">
+            <path d="M252 44 H352 M252 62 H352 M252 80 H352 M252 98 H352"></path>
+          </g>
+          <text x="258" y="122" font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">MARINA · 253 SLIPS</text>
+          <path d="M188 204 L188 92 L300 68" fill="none" stroke="#17a34a" stroke-width="2.4" stroke-dasharray="9 7" style="animation:flow 2.6s linear infinite"></path>
+          <g font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="600" fill="#8d8d8d">
+            <text x="52" y="60">4.2</text><text x="86" y="118">3.8</text><text x="44" y="176">2.6</text>
+            <text x="298" y="176">3.1</text><text x="336" y="158">4.6</text><text x="206" y="196">5.4</text><text x="158" y="116">5.0</text>
+          </g>
+          <g>
+            <rect x="164" y="150" width="9" height="16" fill="#111" style="animation:bob 3s ease-in-out infinite"></rect>
+            <circle cx="206" cy="150" r="6.5" fill="#17a34a" style="animation:bob 3.4s ease-in-out infinite"></circle>
+          </g>
+          <text x="130" y="146" font-family="-apple-system,Helvetica Neue,Arial" font-size="9" font-weight="700" fill="#8d8d8d">PORT</text>
+          <text x="216" y="146" font-family="-apple-system,Helvetica Neue,Arial" font-size="9" font-weight="700" fill="#17a34a">STBD</text>
+          <text x="210" y="222" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#6d6d6d">DEPTHS IN METRES · MLLW</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+        <div style="background:#e7f7ec;color:#17a34a;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em">✓ CHANNEL CLEAR AT 1.5 FT RISING</div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>CONTROLLING DEPTH</span><span>3.8 M</span></div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>ENTRANCE BEARING</span><span>115° T</span></div>
+        <div style="background:#000;color:#fff;border-radius:8px;padding:15px 14px;text-align:center;font:700 13px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em">RESERVE BERTH →</div>
+      </div>
+    </div>
+
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">
+      <div style="font-weight:700;letter-spacing:.05em;color:#111;font-size:11.5px;margin-bottom:5px">SITS WITH · SLIPS/MOORINGS + RESERVE BERTH</div>
+      The only card where a map is load-bearing: it answers “can I get in, and where do I go”. Pre-rendered once per marina, then the live tide reading tints the clearance line green or black. <b>Pre-generated:</b> OpenSeaMap / OSM seamark tags + NOAA ENC soundings, exported to a flat SVG; tide from the existing feed.
+    </div>
+  </div>
+
+  <!-- 1e PASSAGE -->
+  <div id="1e" style="width:414px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:#000;color:#fff;font:700 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.08em;padding:7px 10px;border-radius:6px">1e</div>
+      <div style="font:700 14px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase">Next hop passage map</div>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.07)">
+      <div style="padding:15px 16px 10px;font:600 12px/1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.09em;color:#9a9a9a">NEXT HOP</div>
+      <div style="margin:0 12px;border-radius:9px;overflow:hidden;background:#f6f7f8">
+        <svg viewBox="0 0 390 240" style="display:block;width:100%">
+          <rect width="390" height="240" fill="#f7f8f9"></rect>
+          <path d="M170 0 C232 2 268 16 262 34 C254 54 196 52 176 34 C164 22 158 8 170 0 Z" fill="#e2e2e2" stroke="#bfbfbf" stroke-width="1.3"></path>
+          <text x="188" y="24" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">MARTINIQUE</text>
+          <path d="M186 108 C220 104 246 128 250 168 C254 208 236 236 208 240 L166 240 C154 208 160 176 168 148 C174 126 176 110 186 108 Z" fill="#e2e2e2" stroke="#bfbfbf" stroke-width="1.3"></path>
+          <text x="188" y="176" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.6" fill="#8d8d8d">ST. LUCIA</text>
+          <g stroke="#111" stroke-width="1.8" fill="none" stroke-dasharray="7 6" opacity=".8" style="animation:flow 3s linear infinite">
+            <path d="M164 122 L176 40"></path>
+            <path d="M164 122 L150 190"></path>
+            <path d="M164 122 L144 226"></path>
+          </g>
+          <circle cx="164" cy="122" r="6" fill="#17a34a"></circle>
+          <circle cx="164" cy="122" r="6" fill="none" stroke="#17a34a" stroke-width="1.5" style="animation:pulse 2.6s ease-out infinite"></circle>
+          <g fill="#111">
+            <circle cx="176" cy="40" r="4"></circle><circle cx="150" cy="190" r="4"></circle><circle cx="144" cy="226" r="4"></circle>
+          </g>
+          <g font-family="-apple-system,Helvetica Neue,Arial" font-size="9.5" font-weight="700" fill="#111" letter-spacing="0.5" text-anchor="end">
+            <text x="140" y="44">ST. ANNE 22 NM</text>
+            <text x="130" y="194">MARIGOT 12 NM</text>
+            <text x="124" y="230">SOUFRIÈRE 16 NM</text>
+          </g>
+          <text x="6" y="118" font-family="-apple-system,Helvetica Neue,Arial" font-size="10" font-weight="700" letter-spacing="0.8" fill="#6d6d6d">ETA AT 6 KT · CURRENT WIND</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:12px">
+        <div style="background:#e7f7ec;color:#17a34a;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em">✓ BEAM REACH TO MARIGOT</div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>MARIGOT BAY</span><span>2 H 00 · 195°</span></div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>SOUFRIÈRE</span><span>2 H 40 · 200°</span></div>
+        <div style="background:#f4f4f4;border-radius:8px;padding:13px 14px;font:700 13px/1.2 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:#111;display:flex;justify-content:space-between"><span>ST. ANNE, MQ</span><span>3 H 40 · 350°</span></div>
+      </div>
+    </div>
+
+    <div style="font:400 13px/1.55 -apple-system,'Helvetica Neue',Arial,sans-serif;color:#555;text-wrap:pretty">
+      <div style="font-weight:700;letter-spacing:.05em;color:#111;font-size:11.5px;margin-bottom:5px">SITS WITH · LOCAL CURRENT &amp; TIDE, FORECAST</div>
+      The page tells you today is fine; this tells you where fine gets you. Rhumb lines from the marina to the three usual next anchorages, ETA recomputed from live wind and set/drift, point of sail named in words. <b>Mixed:</b> coastlines pre-generated from OSM/Natural Earth; distances and bearings precomputed constants; ETA and point of sail from the Open-Meteo wind and current already on the page.
+    </div>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>

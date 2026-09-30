@@ -1,0 +1,1 @@
+export { ComingSoonModal } from './ComingSoonModal'

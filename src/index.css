@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Base settings */
+html {
+  font-size: 16px;
+  font-family: 'Rubik', sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
