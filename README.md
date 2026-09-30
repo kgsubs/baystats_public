@@ -14,17 +14,7 @@
 
 ## WHAT IS THIS?
 
-BayStats is a live conditions dashboard for sailors at Caribbean marinas. It brings together wind,
-weather and storm information with facility details for each marina, such as contact info, VHF
-channel, slips and moorings, and services, on one screen that works on a phone.
-
-Facility details come from free-text listings in a public port directory (MarineLink), each written
-by a different contributor in its own layout. An AI model reads each listing and fills in the same
-fixed set of fields, so one pipeline handles every layout, and a person approves each record before
-it appears on the dashboard. Weather, wind and sea state come from Open-Meteo, storm information from
-the National Hurricane Center, and sun and moon times from sunrise-sunset.org; server code fetches,
-caches and computes them directly. Estimated figures are labeled as estimates, and a figure whose
-feed is down is hidden until fresh data arrives.
+A mobile-friendly dashboard that puts Caribbean weather, wind, storm alerts, and marina details in one place. AI organizes scattered marina listings for human approval; live conditions come directly from data providers.
 
 This repository is the real source behind the live product, published as a case study and licensed
 under MIT (see [License](#license)). It is fully installable with your own accounts and API keys for
@@ -39,18 +29,12 @@ Supabase, Gemini and Resend.
 
 ## DESIGN PRINCIPLES & BUSINESS VALUE
 
-- **AI extraction into a fixed form, with a human review queue.** Supplier and vendor directories,
-  real-estate or rental listings, healthcare provider directories, contract and compliance document
-  intake. Any case where the information exists as free text across many sources and must end up in
-  a consistent database.
-- **Trusted and untrusted data kept on separate paths.** Any product that mixes AI-generated content
-  with authoritative numbers, such as financial dashboards or operations reporting.
-- **Cached upstream feeds with a last-good fallback.** Field-operations dashboards for construction,
-  logistics, agriculture or events that depend on weather or third-party data and must stay up and
-  inside the provider's rate limits when those feeds fail.
-- **Estimates labeled as estimates, and a database locked down to what the application actually
-  needs.** Any dashboard that shows a modeled figure next to measured ones, and any product where a
-  security review has to be able to say, in one sentence, who can read and write what.
+- Automate the legwork. Keep human oversight. AI turns inconsistent listings into structured records. A person approves what gets published.
+- Make trust visible. Keep AI content separate from live data, label estimates, and show when information is unavailable.
+- Build for interruptions. Cached feeds and fallback behavior help the dashboard stay useful when providers fail.
+- Control cost and access. AI runs only when an admin requests it. Database permissions limit who can read and change data.
+
+The same approach applies to supplier, property, and provider directories, and dashboards for field operations.
 
 ---
 
