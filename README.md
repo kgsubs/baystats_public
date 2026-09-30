@@ -4,7 +4,7 @@
 
 **Live Build:** [baystats.com](https://baystats.com)
 
-**CONTENTS**
+## CONTENTS
 
 - [WHAT IS THIS?](#what-is-this)
 - [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
