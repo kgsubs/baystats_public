@@ -12,6 +12,7 @@ Supabase, Gemini and Resend.
 
 **CONTENTS**
 
+- [WHAT IS THIS?](#what-is-this)
 - [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
 - [TECHNICAL OVERVIEW](#technical-overview)
   - [ARCHITECTURE](#architecture)
@@ -23,6 +24,8 @@ Supabase, Gemini and Resend.
   - [STACK](#stack)
 - [RUN IT YOURSELF](#run-it-yourself)
 - [LICENSE](#license)
+
+## WHAT IS THIS?
 
 BayStats is a live conditions dashboard for sailors at Caribbean marinas. It brings together wind,
 weather and storm information with facility details for each marina, such as contact info, VHF
