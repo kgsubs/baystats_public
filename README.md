@@ -6,7 +6,11 @@
 
 ## CONTENTS
 
-[What Is This?](#what-is-this) · [Design Principles & Business Value](#design-principles--business-value) · [Technical Overview](#technical-overview) · [Run It Yourself](#run-it-yourself) · [License](#license)
+[What Is This?](#what-is-this)\
+[Design Principles & Business Value](#design-principles--business-value)\
+[Technical Overview](#technical-overview)\
+[Run It Yourself](#run-it-yourself)\
+[License](#license)
 
 ## WHAT IS THIS?
 
