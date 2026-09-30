@@ -29,7 +29,7 @@ Supabase, Gemini and Resend.
 
 ---
 
-## Design principles for this build, where else they can apply.
+## DESIGN PRINCIPLES & BUSINESS VALUE
 
 - **AI extraction into a fixed form, with a human review queue.** Supplier and vendor directories,
   real-estate or rental listings, healthcare provider directories, contract and compliance document
@@ -46,9 +46,9 @@ Supabase, Gemini and Resend.
 
 ---
 
-## Technical overview
+## TECHNICAL OVERVIEW
 
-### Architecture
+### ARCHITECTURE
 
 Two pipelines, separated by how far their output can be trusted. Facility data is extracted by a
 model and approved by a person. Conditions data is fetched and computed by fixed server code.
@@ -89,7 +89,7 @@ model and approved by a person. Conditions data is fetched and computed by fixed
 Every figure on the dashboard comes from a data feed or is labeled as an estimate. The earlier tide
 and current cards presented a modeled estimate as a reading, so they were removed.
 
-### Key decisions
+### KEY DECISIONS
 
 - **AI runs on admin request.** Extraction runs when an admin submits a page, which keeps AI cost
   tied to admin work and independent of site traffic. (`netlify/functions/marina-scrape.ts`,
@@ -110,7 +110,7 @@ and current cards presented a modeled estimate as a reading, so they were remove
 - **Plain React and SVG.** The wind field is inline SVG over committed coastline geometry, motion is
   CSS keyframes, and state is component state plus a few hooks.
 
-### Security
+### SECURITY
 
 - **Database.** `supabase/schema.sql` is dumped from the live database. Row-level security is on for
   all 11 tables (8 policies). Every function has a pinned `search_path` and performs one specific
@@ -128,7 +128,7 @@ and current cards presented a modeled estimate as a reading, so they were remove
   `unavailable` (`netlify/functions/tropical.ts`). The wind card serves its last good value, or hides
   the map.
 
-### Modeled figures
+### MODELED FIGURES
 
 Open-Meteo samples 8 points spanning 2 to 5 km, depending on the bay, and returns the same value at
 all 8, because its grids are 2 to 25 km wide. The sheltering effect the wind card exists to show is
@@ -141,7 +141,7 @@ finer than the feed resolves, so the anchorage figure is modeled:
 - **Hidden on failure.** With the feed down and the cache empty, the map is hidden until fresh data
   arrives. (`src/components/windfield/WindFieldCard.tsx`)
 
-### How it was planned and tested
+### HOW IT WAS PLANNED AND TESTED
 
 - **Design.** The wind card's handoff sets its states, acceptance criteria and the rule that flow
   arrows point downwind (`design_handoff_wind_field_card/README.md`). It took two design rounds; the
@@ -154,7 +154,7 @@ finer than the feed resolves, so the anchorage figure is modeled:
   parsing, wind readings, token hashing) and 17 browser tests (`tests/`, against a stubbed backend).
   Both run offline.
 
-### Project structure
+### PROJECT STRUCTURE
 
 ```
 .
@@ -181,7 +181,7 @@ finer than the feed resolves, so the anchorage figure is modeled:
 `-- docs/                              Specification, packets, build record
 ```
 
-### Stack
+### STACK
 
 | Layer | Choice | Notes |
 |---|---|---|
@@ -203,7 +203,7 @@ finer than the feed resolves, so the anchorage figure is modeled:
 
 ---
 
-## Run it yourself
+## RUN IT YOURSELF
 
 **What you need**
 
@@ -284,7 +284,7 @@ from its MarineLink page.
 
 ---
 
-## License
+## LICENSE
 
 MIT. See [LICENSE](LICENSE).
 
