@@ -6,6 +6,20 @@
 
 **Live Build:** [baystats.com](https://baystats.com)
 
+**CONTENTS**
+
+- [DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)
+- [TECHNICAL OVERVIEW](#technical-overview)
+  - [ARCHITECTURE](#architecture)
+  - [KEY DECISIONS](#key-decisions)
+  - [SECURITY](#security)
+  - [MODELED FIGURES](#modeled-figures)
+  - [HOW IT WAS PLANNED AND TESTED](#how-it-was-planned-and-tested)
+  - [PROJECT STRUCTURE](#project-structure)
+  - [STACK](#stack)
+- [RUN IT YOURSELF](#run-it-yourself)
+- [LICENSE](#license)
+
 BayStats is a live conditions dashboard for sailors at Caribbean marinas. It brings together wind,
 weather and storm information with facility details for each marina, such as contact info, VHF
 channel, slips and moorings, and services, on one screen that works on a phone.
