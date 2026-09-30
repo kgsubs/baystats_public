@@ -1,6 +1,6 @@
 # BayStats
 
-**The best way to get good at something is to put it to work on something you care about. I built this app while living aboard an [Oceanis 473](https://www.beneteau.com/oceanis-1995-2008/oceanis-clipper-473) wondering why there wasn't a free, simple to use tool that told me all the important stuff needed to plan the sail for day and didn't have a UI that looked so 1999.**
+*I built this app while living aboard an [Oceanis 473](https://www.beneteau.com/oceanis-1995-2008/oceanis-clipper-473) wondering why there wasn't a free, simple to use tool that told me all the important stuff needed to plan the sail for day and didn't have a UI that looked so 1999.*
 
 **Live Build:** [baystats.com](https://baystats.com)
 
