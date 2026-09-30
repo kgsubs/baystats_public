@@ -1,287 +1,249 @@
 # BayStats
 
-*My client work stays confidential, so I build personal projects like this to share how I think and work. I built this app while living aboard an [Oceanis 473](https://www.beneteau.com/oceanis-1995-2008/oceanis-clipper-473) wondering why there wasn't a free, simple to use tool that told me all the important stuff needed to plan the sail for day and didn't have a UI that looked so 1999.*
+*My client work stays confidential, so I build personal projects like this to share how I think and work. I built BayStats while living aboard an [Oceanis 473](https://www.beneteau.com/oceanis-1995-2008/oceanis-clipper-473). I wanted a free, simple dashboard with the information I needed to plan a day’s sailing.*
 
-**Live Build:** [baystats.com](https://baystats.com)
+**[Try the live app](https://baystats.com)**
 
-## CONTENTS
+## Contents
 
-[WHAT IS THIS?](#what-is-this)\
-[DESIGN PRINCIPLES & BUSINESS VALUE](#design-principles--business-value)\
-[TECHNICAL OVERVIEW](#technical-overview)\
-[RUN IT YOURSELF](#run-it-yourself)\
-[LICENSE](#license)
+- [What is this?](#what-is-this)
+- [Design principles & business value](#design-principles--business-value)
+- [Key engineering decisions](#key-engineering-decisions)
+- [Architecture](#architecture)
+- [Validation & limitations](#validation--limitations)
+- [Technical reference](#technical-reference)
+- [Run it yourself](#run-it-yourself)
+- [License & credits](#license--credits)
 
-## WHAT IS THIS?
+## What is this?
 
-A mobile-friendly dashboard that puts Caribbean weather, wind, storm alerts, and marina details in one place. AI organizes scattered marina listings for human approval; live conditions come directly from data providers.
+A mobile-friendly dashboard that puts Caribbean weather, wind, storm information, and marina details in one place. AI organizes scattered marina listings for human approval; conditions come directly from data providers.
 
-This repository is the real source behind the live product, published as a case study and licensed
-under MIT (see [License](#license)). It is fully installable with your own accounts and API keys for
-Supabase, Gemini and Resend.
+The current build covers two live locations, Rodney Bay and Marigot Bay. The repository includes five approved marina records.
 
 | | | |
 |---|---|---|
 | ![Dashboard, light](docs/screenshots/dashboard-light.png) | ![Dashboard, dark](docs/screenshots/dashboard-dark.png) | ![Wind on the Water](docs/screenshots/wind-card.png) |
-| Rodney Bay, light | The same, dark | The wind field card |
+| Rodney Bay, light | The same dashboard, dark | Wind conditions and estimated shelter |
 
----
+This is the source behind the live product, published as an installable case study under the MIT license.
 
-## DESIGN PRINCIPLES & BUSINESS VALUE
+## Design principles & business value
 
-- Automate the legwork. Keep human oversight. AI turns inconsistent listings into structured records. A person approves what gets published.
-- Make trust visible. Keep AI content separate from live data, label estimates, and show when information is unavailable.
-- Build for interruptions. Cached feeds and fallback behavior help the dashboard stay useful when providers fail.
-- Control cost and access. AI runs only when an admin requests it. Database permissions limit who can read and change data.
+- **Automate the legwork. Keep human oversight.** AI turns inconsistent listings into structured records. A person approves what gets published.
+- **Make trust visible.** Keep AI content separate from conditions data, label estimates, and show when information is unavailable.
+- **Build for interruptions.** Cached feeds and fallback behavior help the dashboard stay useful when providers fail.
+- **Control cost and access.** AI runs only when an admin requests it. Database permissions limit who can read and change data.
 
 The same approach applies to supplier, property, and provider directories, and dashboards for field operations.
 
----
+## Key engineering decisions
 
-## TECHNICAL OVERVIEW
+### Use AI where the source material is inconsistent
 
-### ARCHITECTURE
+Marina listings arrive as free text, with different layouts and levels of detail. Gemini extracts them into a fixed 22-field schema. Server validation checks the values, and an admin reviews each record before publication.
 
-Two pipelines, separated by how far their output can be trusted. Facility data is extracted by a
-model and approved by a person. Conditions data is fetched and computed by fixed server code.
+AI runs only when an admin submits a listing, so extraction cost is tied to maintenance work rather than visitor traffic. The scraper accepts one approved HTTPS hostname and rejects redirects.
 
-**Pipeline 1: facility extraction (admin-triggered, human-approved)**
+[Extraction implementation](netlify/functions/marina-scrape.ts)
 
-```
-[ Free-text marina listing, MarineLink ]
-            |
-            v
-[ Gemini, schema-enforced output ]   schema-valid output moves on
-            |
-            v
-[ Server-side field validation ]     each bad field is set to a safe default
-            |
-            v
-[ Review queue ]                     an admin approves each record
-            |
-            v
-[ Supabase, row-level security ]     public queries read approved records
-            |
-            v
-[ Public dashboard ]
-```
+### Protect published information during updates
 
-**Pipeline 2: conditions (fixed server code)**
+Re-extracting a marina saves the new information separately for comparison. It does not overwrite the published record or an admin’s edits.
 
-```
-[ 8 sample points, one request ] -> [ Open-Meteo ] -> [ shape check ]
-            |
-            v
-[ 10-minute server cache + last-good value ]
-            |
-            v
-[ Shelter model ] -> [ SVG map, estimate labeled ]
-```
+This allows automation to assist maintenance while preserving editorial control.
 
-Every figure on the dashboard comes from a data feed or is labeled as an estimate. The earlier tide
-and current cards presented a modeled estimate as a reading, so they were removed.
+[Extraction and update handling](netlify/functions/marina-scrape.ts)
 
-### KEY DECISIONS
+### Keep conditions independent of AI
 
-- **AI runs on admin request.** Extraction runs when an admin submits a page, which keeps AI cost
-  tied to admin work and independent of site traffic. (`netlify/functions/marina-scrape.ts`,
-  `verifyAdminFromCookie`)
-- **Extraction is checked twice.** Gemini is constrained to the 22-field schema
-  (`responseMimeType` plus `responseJsonSchema`), which guarantees valid JSON. `sanitizeMarinaData`
-  then checks each value and sets any bad field to a safe default. A scrape is saved when it has at
-  least a name and a location.
-- **A re-scrape of a published marina is stored beside it.** The new extraction goes into
-  `scraped_data` for comparison, and the published record and admin edits stay as they are.
-- **The scraper fetches one approved source.** It requires HTTPS and one exact hostname, and stops
-  at any redirect. (`scrapeMarinaPage`)
-- **One weather request per location, cached at the server.** All 8 sample points come back in one
-  Open-Meteo call, cached for 10 minutes, with the last good value served if a fetch fails. This
-  holds upstream calls at a fixed rate regardless of site traffic. (`netlify/functions/wind-field.ts`,
-  `CACHE_MS`)
-- **Estimates are bounded and labeled.** See [Modeled figures](#modeled-figures).
-- **Plain React and SVG.** The wind field is inline SVG over committed coastline geometry, motion is
-  CSS keyframes, and state is component state plus a few hooks.
+Weather, wind, sea state, storm information, and daily sun and moon times are fetched or computed by server code. The model does not generate those numbers.
 
-### SECURITY
+Wind samples are fetched in one request per location and cached for ten minutes. If that request fails, the dashboard can use its last good wind value. Without a cached value, it hides the wind map. Storm Watch explicitly reports when its feed is unavailable.
 
-- **Database.** `supabase/schema.sql` is dumped from the live database. Row-level security is on for
-  all 11 tables (8 policies). Every function has a pinned `search_path` and performs one specific
-  operation; an earlier general-purpose SQL function was removed
-  (`supabase/migrations_history/031_security_lockdown.sql`).
-- **Admin functions.** The schema limits the two functions that manage admin status to the server,
-  overriding Supabase's default grants to anonymous and signed-in users. (`supabase/schema.sql`, end
-  of file)
-- **Sign-in.** An emailed one-time link. Sign-in and session tokens are stored as SHA-256 hashes.
-  (`src/lib/auth.ts`)
-- **Public data.** Public endpoints return a fixed list of public columns.
-  (`netlify/functions/admin-marinas.ts`, `PUBLIC_MARINA_COLUMNS`)
-- **Errors.** A malformed request gets a short JSON error message.
-- **Feed failures.** When the hurricane feed fails or cannot be read, Storm Watch shows
-  `unavailable` (`netlify/functions/tropical.ts`). The wind card serves its last good value, or hides
-  the map.
+[Wind feed and cache](netlify/functions/wind-field.ts) · [Storm feed](netlify/functions/tropical.ts)
 
-### MODELED FIGURES
+### Show the limits of the data
 
-Open-Meteo samples 8 points spanning 2 to 5 km, depending on the bay, and returns the same value at
-all 8, because its grids are 2 to 25 km wide. The sheltering effect the wind card exists to show is
-finer than the feed resolves, so the anchorage figure is modeled:
+The weather feed is too coarse to measure shelter within an anchorage. BayStats therefore labels its shelter-adjusted wind figure as an estimate.
 
-- **Bounded.** It comes from wind direction against the bay's mouth bearing, clamped to a factor of
-  0.40 to 1.00, so it scales a wind speed down by up to 60 percent.
-- **Labeled.** The interface says beneath the number: *anchorage figure is estimated from wind
-  direction against the mouth of the bay, not measured*.
-- **Hidden on failure.** With the feed down and the cache empty, the map is hidden until fresh data
-  arrives. (`src/components/windfield/WindFieldCard.tsx`)
+Earlier tide and current cards were removed because they presented modeled estimates as readings. The wind display also went through a correction when its initial arrows pointed in the wrong direction.
 
-### HOW IT WAS PLANNED AND TESTED
+These changes reflect a product principle: the interface should make the evidence and its limits clear.
 
-- **Design.** The wind card's handoff sets its states, acceptance criteria and the rule that flow
-  arrows point downwind (`design_handoff_wind_field_card/README.md`). It took two design rounds; the
-  first had the arrows pointing the wrong way.
-- **Build plan.** The packet dependency graph, scope limits and per-packet gates are in
-  `docs/BUILD_RECORD.md` (the pre-execution specification, labeled as such).
-- **Risks.** Risks, mitigations and open questions are in `docs/PRD.md`, sections 10 and 11. The
-  "What changed since this plan" note near the top of that file covers what shipped differently.
-- **Tests.** 20 unit tests (`unit/`: extraction validation, shelter-factor math, storm outlook
-  parsing, wind readings, token hashing) and 17 browser tests (`tests/`, against a stubbed backend).
-  Both run offline.
+[Wind card](src/components/windfield/WindFieldCard.tsx) · [Design handoff](design_handoff_wind_field_card/README.md)
 
-### PROJECT STRUCTURE
+## Architecture
 
-```
-.
-|-- server/index.ts                    Express entry, mounts every handler
-|-- netlify/functions/                 Request handlers (historical folder name; served by Express)
-|   |-- marina-scrape.ts               Gemini extraction pipeline and its guardrails
-|   |-- wind-field.ts                  Batched conditions fetch, cache, shelter model
-|   |-- weather.ts, tropical.ts, ...   Remaining conditions endpoints
-|   `-- auth-*.ts                      Emailed-link sign-in, hashed tokens
-|-- src/
-|   |-- pages/                         Dashboard, account, admin screens
-|   |-- components/windfield/          The wind card
-|   |-- config/windField.ts            Per-location basemaps and sample coordinates
-|   |-- config/locations.ts            The 16-location registry (2 live: Rodney Bay, Marigot Bay)
-|   |-- hooks/                         Data fetching, one hook per feed
-|   `-- lib/                           Auth (hashed tokens), Supabase client, access rules
-|-- supabase/schema.sql                Full schema, dumped from the live database
-|-- supabase/seed.sql                  The five approved marinas
-|-- supabase/migrations_history/       The migrations that built it, kept as a record
-|-- scripts/create-admin.ts            Grants admin to an email address
-|-- scripts/dump-schema.sh             Regenerates supabase/schema.sql from a live database
-|-- tests/, unit/                      Playwright (stubbed backend) and Node unit tests
-|-- deploy/                            nginx template, certificate bootstrap, PM2 config
-`-- docs/                              Specification, packets, build record
+Two pipelines reflect two different levels of trust. Extracted facility information requires human approval. Conditions are fetched and computed directly.
+
+```mermaid
+flowchart TD
+    A["Marina listing"] --> B["AI extraction"]
+    B --> C["Server validation"]
+    C --> D["Human review"]
+    D --> E["Approved database records"]
+    E --> F["Dashboard"]
+    G["Conditions providers"] --> H["Server fetching and calculations"]
+    H --> I["Cache and failure handling"]
+    I --> F
 ```
 
-### STACK
+**Facility data:** MarineLink listings → Gemini extraction → validation → admin approval → Supabase.
 
-| Layer | Choice | Notes |
-|---|---|---|
-| **Frontend** | React 19, TypeScript, Vite 7 | Dashboard styled from an inline theme object; Tailwind for the admin screens |
-| **Routing** | React Router 7 | Single-page app, served as static files |
-| **Backend** | Express 5 on Node, TypeScript | Handlers live in `netlify/functions/` (historical name) and are mounted by `server/index.ts` |
-| **Database** | Supabase, PostgreSQL | Row-level security on all 11 tables; review status also enforced in application code |
-| **Auth** | Session tokens in an httpOnly cookie, stored hashed | Sign-in by emailed link |
-| **AI** | Google Gemini | Schema-enforced extraction, admin-triggered |
-| **Email** | Resend | Sign-in links |
-| **Weather data** | Open-Meteo | One batched request per location, cached 10 minutes |
-| **Storm data** | National Hurricane Center | Atlantic feed and tropical outlook |
-| **Sun and moon** | sunrise-sunset.org, Open-Meteo | Daily times per location |
-| **Map geometry** | OpenStreetMap coastline, ODbL | Projected, simplified, committed as SVG paths |
-| **Testing** | Node test runner, Playwright | Run offline |
-| **Web server** | nginx | Serves built files from the origin server |
-| **Process supervision** | PM2 | Keeps the API running |
-| **TLS** | Let's Encrypt | Issued and renewed by certbot |
+**Conditions:** Open-Meteo, the National Hurricane Center, and sunrise-sunset.org → server code → dashboard. Modeled figures are labeled separately.
 
----
+### Access and security
 
-## RUN IT YOURSELF
+- Row-level security is enabled on all 11 database tables.
+- Admin-management database functions are restricted to the server.
+- Public endpoints return a fixed set of public columns; public queries expose approved records.
+- Sign-in uses emailed one-time links. Sign-in and session tokens are stored as SHA-256 hashes.
+- Database functions have a fixed search path and perform specific operations. An earlier general-purpose SQL function was removed.
 
-**What you need**
+[Database schema](supabase/schema.sql) · [Authentication](src/lib/auth.ts) · [Public data handling](netlify/functions/admin-marinas.ts) · [Security migration](supabase/migrations_history/031_security_lockdown.sql)
 
-- Node 20 or later
-- A Supabase project (the database)
-- A Gemini API key from Google AI Studio (the AI extraction)
-- A Resend account with a verified sending domain (sign-in emails)
+## Validation & limitations
 
-**1. Get the code**
+### What is tested
 
-```
+The repository includes:
+
+- **20 unit tests** covering extraction validation, shelter calculations, storm parsing, wind readings, and token hashing.
+- **17 browser tests** against a stubbed backend.
+
+Both suites run offline. They verify application behavior without depending on live provider availability.
+
+[Unit tests](unit/) · [Browser tests](tests/)
+
+### What the wind estimate means
+
+Open-Meteo’s grids are approximately 2–25 km wide. The eight sample points used for a bay span approximately 2–5 km and return the same value, so they do not resolve local shelter.
+
+The anchorage estimate applies a factor based on wind direction and the bay’s mouth bearing. That factor is bounded between 0.40 and 1.00, reducing the reported wind speed by up to 60%.
+
+The interface labels this as an estimate, not a measurement. A cached wind value may remain available during a feed failure; without one, the map is hidden.
+
+### Scope and build evidence
+
+The location registry contains 16 locations; two are currently live. The offline tests do not establish the accuracy or availability of external feeds.
+
+The planning documents preserve the original decisions and intended scope. Where the shipped product differs, the PRD includes a “What changed since this plan” note.
+
+[Product specification and risks](docs/PRD.md) · [Pre-execution build plan](docs/BUILD_RECORD.md) · [Wind-card acceptance criteria](design_handoff_wind_field_card/README.md)
+
+## Technical reference
+
+<details>
+<summary>Stack and deployment</summary>
+
+| Layer | Implementation |
+|---|---|
+| Frontend | React 19, TypeScript, Vite 7, React Router 7 |
+| UI | Inline dashboard theme, Tailwind for admin screens, SVG wind map |
+| Backend | Express 5 on Node |
+| Database | Supabase / PostgreSQL |
+| AI extraction | Google Gemini |
+| Authentication | Emailed links; hashed tokens; httpOnly session cookie |
+| Email | Resend |
+| Weather and sea state | Open-Meteo |
+| Storm information | National Hurricane Center |
+| Sun and moon times | sunrise-sunset.org and Open-Meteo |
+| Map geometry | OpenStreetMap coastline, committed as SVG paths |
+| Tests | Node test runner and Playwright |
+| Hosting | nginx, PM2, Let’s Encrypt |
+
+Request handlers remain in `netlify/functions/` for historical reasons. They are served by Express.
+
+</details>
+
+<details>
+<summary>Where to find the implementation</summary>
+
+| Location | Purpose |
+|---|---|
+| [server/index.ts](server/index.ts) | Express entry point |
+| [netlify/functions/](netlify/functions/) | Extraction, conditions, authentication, and admin handlers |
+| [src/pages/](src/pages/) | Dashboard, account, and admin screens |
+| [src/components/windfield/](src/components/windfield/) | Wind visualization |
+| [src/config/](src/config/) | Locations, basemaps, and sample coordinates |
+| [src/hooks/](src/hooks/) | Feed fetching |
+| [src/lib/](src/lib/) | Authentication, database client, and access rules |
+| [supabase/schema.sql](supabase/schema.sql) | Schema exported from the live database |
+| [supabase/seed.sql](supabase/seed.sql) | Five approved marina records |
+| [supabase/migrations_history/](supabase/migrations_history/) | Database change history |
+| [deploy/](deploy/) | nginx, certificate bootstrap, and PM2 configuration |
+| [docs/](docs/) | Specifications and build records |
+
+</details>
+
+## Run it yourself
+
+You need Node 20 or later, a Supabase project, a Gemini API key, and a Resend account with a verified sending domain.
+
+### 1. Install and test
+
+```bash
 git clone https://github.com/kgsubs/baystats_public.git
 cd baystats_public
 npm ci
-```
-
-**2. Check it works (runs offline)**
-
-```
 npm run test:unit
 npx playwright install chromium
 npm test
 ```
 
-The second line is needed the first time only.
+Chromium installation is required only once. Both test suites run offline.
 
-**3. Add your settings**
+### 2. Configure your accounts
 
-```
+```bash
 cp .env.example .env
 ```
 
-Then fill in these lines in `.env`:
+Fill in the following settings:
 
-| Setting | What goes there |
+| Variable | Value |
 |---|---|
-| `VITE_SUPABASE_URL` | Supabase: Project Settings, API Keys, the project URL |
-| `SUPABASE_SERVICE_KEY` | Same page: the secret key |
-| `SUPABASE_DB_URL` | Supabase: Connect, Session pooler string, with your database password in it |
-| `GEMINI_API_KEY` | Google AI Studio: Get API key |
-| `RESEND_API_KEY` | Resend: API Keys |
-| `EMAIL_FROM` | `Your Name <you@your-verified-domain>` |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SERVICE_KEY` | Supabase secret key |
+| `SUPABASE_DB_URL` | Supabase session-pooler connection string, including your database password |
+| `GEMINI_API_KEY` | Google AI Studio API key |
+| `RESEND_API_KEY` | Resend API key |
+| `EMAIL_FROM` | Sender address on your verified domain |
 | `SITE_URL` | `http://localhost:5173` |
-| `ADMIN_EMAIL` | The email address you will sign in with |
+| `ADMIN_EMAIL` | Email address you will use to sign in |
 
-**4. Set up the database**
+### 3. Create the database
 
-Run both files against your database. Replace `<SUPABASE_DB_URL>` with the same string you put in
-`.env`:
+Run these commands with your connection string in place of `<SUPABASE_DB_URL>`:
 
-```
+```bash
 psql "<SUPABASE_DB_URL>" -v ON_ERROR_STOP=1 -f supabase/schema.sql
 psql "<SUPABASE_DB_URL>" -v ON_ERROR_STOP=1 -f supabase/seed.sql
 ```
 
-Or paste each file into the Supabase SQL editor, schema first. The seed adds the five approved
-marinas.
+Alternatively, paste both files into the Supabase SQL editor, schema first.
 
-**5. Start it**
+### 4. Start the app and enable admin access
 
-```
+```bash
 npm run dev
 ```
 
 Open http://localhost:5173.
 
-**6. Make yourself an admin**
+In another terminal:
 
-```
+```bash
 npx tsx scripts/create-admin.ts
 ```
 
-Sign in at http://localhost:5173/admin/login with your `ADMIN_EMAIL`, then extract your first marina
-from its MarineLink page.
+Sign in at http://localhost:5173/admin/login using `ADMIN_EMAIL`. You can then extract a marina from its MarineLink listing and review it for publication.
 
-**Deploying to a server:** `deploy/` has the nginx template, the certificate bootstrap
-(`golive.sh`) and the PM2 config (`ecosystem.config.cjs`).
+**Server deployment:** see [deploy/](deploy/) for nginx configuration, certificate setup, and PM2 configuration.
 
----
-
-## LICENSE
+## License & credits
 
 MIT. See [LICENSE](LICENSE).
 
----
-
-Weather and marine data from [Open-Meteo](https://open-meteo.com). Storm data from the
-[National Hurricane Center](https://www.nhc.noaa.gov). Coastline geometry (c)
-[OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, ODbL.
+Weather and marine data: [Open-Meteo](https://open-meteo.com). Storm data: [National Hurricane Center](https://www.nhc.noaa.gov). Coastline geometry: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, ODbL.
