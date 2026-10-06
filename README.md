@@ -109,7 +109,7 @@ flowchart TD
 
 The repository includes:
 
-- **20 unit tests** covering extraction validation, shelter calculations, storm parsing, wind readings, and token hashing.
+- **21 unit tests** covering extraction validation, shelter calculations, storm parsing, wind readings, and token hashing.
 - **17 browser tests** against a stubbed backend.
 
 Both suites run offline. They verify application behavior without depending on live provider availability.
