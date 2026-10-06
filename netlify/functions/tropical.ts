@@ -60,6 +60,8 @@ async function parseNHCXml(xmlText: string, origin: { lat: number; lon: number }
       const title = match[1] || '';
       const description = match[2] || '';
       if (title.includes('hurricane season runs') || title.includes('Tropical Weather Outlook')) continue;
+      // NHC's quiet-season item ("There are no tropical cyclones at this time.") is not a storm report.
+      if (/no tropical cyclones/i.test(title)) continue;
 
       const isTropicalSystem = /tropical|hurricane|depression|storm/i.test(title) && !/outlook|discussion/i.test(title);
       if (isTropicalSystem) {

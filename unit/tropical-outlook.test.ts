@@ -61,3 +61,25 @@ Forecaster Papin
     restore();
   }
 });
+
+test('NHC\'s "no tropical cyclones" item reads as clear, not unavailable', async () => {
+  const { handler } = await import('../netlify/functions/tropical.ts');
+  // The Atlantic feed as NHC served it on 2026-10-06 with no active storms.
+  const rss = `<?xml version="1.0"?><rss><channel><title>NHC Atlantic</title>
+    <item><title>Atlantic Tropical Weather Outlook</title><description>outlook</description></item>
+    <item>
+      <title>There are no tropical cyclones at this time.</title>
+      <description>No tropical cyclones as of Tue, 06 Oct 2026 12:50:10 GMT</description>
+    </item></channel></rss>`;
+  const original = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => ({
+    ok: true, status: 200,
+    text: async () => (String(url).includes('index-at.xml') ? rss : twoatXml('Tropical Weather Outlook\n\nTropical cyclone formation is not expected during the next 7 days.')),
+  })) as unknown as typeof fetch;
+  try {
+    const res = await handler({ httpMethod: 'GET', queryStringParameters: { location: 'rodney-bay' } } as never, {} as never);
+    const body = JSON.parse((res as { body: string }).body);
+    assert.equal(body.status, 'clear');
+    assert.deepEqual(body.activeSystems, []);
+  } finally { globalThis.fetch = original; }
+});
