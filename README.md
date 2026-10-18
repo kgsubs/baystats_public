@@ -1,6 +1,6 @@
 # BayStats
 
-*My client work stays confidential, so I build personal projects like this to share how I think and work. I built BayStats while living aboard an [Oceanis 473](https://www.beneteau.com/oceanis-1995-2008/oceanis-clipper-473). I wanted a free, simple dashboard with the information I needed to plan a day’s sailing.*
+*I built BayStats while living aboard an [Oceanis 473](https://www.beneteau.com/oceanis-1995-2008/oceanis-clipper-473). I wanted a free, simple dashboard with the information I needed to plan a day’s sailing.*
 
 **[Try the live app](https://baystats.com)**
 
